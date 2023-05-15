@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Api
+from flask_talisman import Talisman
 
 db = SQLAlchemy()
 api = Api()
@@ -14,6 +15,8 @@ def create_app():
     app.config['OPENAI_SECRET_KEY'] = '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'
 
     db.init_app(app)
+
+    Talisman(app, content_security_policy=None, force_https=True, strict_transport_security=True)
 
     # Register App
 
