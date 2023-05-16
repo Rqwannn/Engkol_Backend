@@ -30,9 +30,7 @@ def create_app():
 
     login_manager.init_app(app)
 
-    from app.models.bussines_plan import bussiness_plan
     from app.models.user import users
-    from app.models.money_bookkeeping import money_bookeeping
 
     @login_manager.user_loader
     def load_user(user_id):
