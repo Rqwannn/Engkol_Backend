@@ -3,9 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_talisman import Talisman
+from flask_login import LoginManager
 
 db = SQLAlchemy()
 api = Api()
+login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
@@ -18,8 +20,6 @@ def create_app():
 
     Talisman(app, content_security_policy=None, force_https=True, strict_transport_security=True)
 
-    # Register App
-
     # Register Path
 
     from app.path_url.bussines_plan import BUSSINES_PLAN_API_PATH
@@ -27,6 +27,17 @@ def create_app():
     BUSSINES_PLAN_API_PATH()
 
     api.init_app(app)
+
+    login_manager.init_app(app)
+
+    from app.models.bussines_plan import bussiness_plan
+    from app.models.user import users
+    from app.models.money_bookkeeping import money_bookeeping
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        # since the user_id is just the primary key of our user table, use it in the query for the user
+        return users.query.get(int(user_id))
 
     Migrate(app, db)
 
