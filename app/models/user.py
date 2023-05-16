@@ -15,7 +15,7 @@ class users_history(db.Model):
     user_history = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
     description = db.Column(db.Text)
-    history_date = db.Column(db.DateTime)
+    history_date = db.Column(db.DateTime, default = datetime.utcnow())
 
 class profile(db.Model):
     profile_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
