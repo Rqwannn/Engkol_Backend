@@ -9,7 +9,6 @@ db = SQLAlchemy()
 api = Api()
 login_manager = LoginManager()
 
-
 def create_app():
     app = Flask(__name__)
 
@@ -21,14 +20,11 @@ def create_app():
 
     Talisman(app, content_security_policy=None, force_https=True, strict_transport_security=True)
 
-    # Register Path
+    from app.urls import __URLPATH__
 
-    from app.path_url.bussines_plan import business_plan_api_path
-
-    business_plan_api_path()
+    __URLPATH__()
 
     api.init_app(app)
-
     login_manager.init_app(app)
 
     from app.models.user import Users
