@@ -9,6 +9,7 @@ db = SQLAlchemy()
 api = Api()
 login_manager = LoginManager()
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -22,20 +23,20 @@ def create_app():
 
     # Register Path
 
-    from app.path_url.bussines_plan import BUSSINES_PLAN_API_PATH
+    from app.path_url.bussines_plan import business_plan_api_path
 
-    BUSSINES_PLAN_API_PATH()
+    business_plan_api_path()
 
     api.init_app(app)
 
     login_manager.init_app(app)
 
-    from app.models.user import users
+    from app.models.user import Users
 
     @login_manager.user_loader
     def load_user(user_id):
         # since the user_id is just the primary key of our user table, use it in the query for the user
-        return users.query.get(int(user_id))
+        return Users.query.get(int(user_id))
 
     Migrate(app, db)
 

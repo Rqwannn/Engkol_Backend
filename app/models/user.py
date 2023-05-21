@@ -3,7 +3,8 @@ from datetime import datetime
 from app import db
 import uuid
 
-class users(db.Model, UserMixin):
+
+class Users(db.Model, UserMixin):
     user_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     username = db.Column(db.String(30), unique=True)
     email = db.Column(db.String(100), unique=True)
@@ -11,13 +12,15 @@ class users(db.Model, UserMixin):
     profile = db.relationship("profile", backref='profile', lazy=True, uselist=True)
     is_deleted = db.Column(db.Boolean)
 
-class users_history(db.Model):
+
+class UsersHistory(db.Model):
     user_history = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
     description = db.Column(db.Text)
-    history_date = db.Column(db.DateTime, default = datetime.utcnow())
+    history_date = db.Column(db.DateTime, default=datetime.utcnow())
 
-class profile(db.Model):
+
+class Profile(db.Model):
     profile_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
     first_name = db.Column(db.String(30))
