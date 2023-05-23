@@ -1,0 +1,34 @@
+# Mengambil Data
+
+User.query.filter_by(email=email).first_or_404() # Mengambil data apa saja yang emailnya sama
+
+# Menambah Data 
+
+# Note: untuk menambah data kalau bisa di tambah semua fieldnya ( jika fieldnya not null )
+
+username = request.form.get('username')
+email = request.form.get('email')
+
+user = User(username=username, email=email, ... dan lain sebagainya)
+db.session.add(user)
+db.session.commit()
+
+# Mengedit Data
+
+user_data = {
+    "username": request.form['username'],
+    "password": request.form['password']
+}
+
+User.query.filter_by(user_id=user_id).update(user_data)
+db.session.commit()
+
+# Menghapus Data
+
+# Jika yang soft delete pakai edit aja, tinggal ganti is_delete yang tadinya 0 jadi 1
+
+# Hapus Permanent
+
+user = User.query.get_or_404(user_id)
+db.session.delete(user)
+db.session.commit()
