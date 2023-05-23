@@ -1,5 +1,6 @@
 from app import db
 import uuid
+from datetime import datetime
 
 class Money_Bookeeping(db.Model):
     money_bookeeping_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
@@ -16,8 +17,8 @@ class Bookeeping_Account(db.Model):
     password = db.Column(db.String(50))
     name_account = db.Column(db.String(50))
     role_id = db.Column(db.String(50), db.ForeignKey('money_bookeeping_role.role_id'))
-    created_at = db.DateTimeField(auto_now_add=True)
-    deleted_at =db.DateTimeField(auto_now_add=True)
+    created_at = datetime.now()
+    deleted_at = datetime.now()
 
 class Money_Bookeeping_Role(db.Model):
     role_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
@@ -29,4 +30,4 @@ class Activity_Role(db.Model):
     money_bookeeping_account = db.Column(db.String(36), db.ForeignKey('bookeeping_account.bookeeping_account_id'))
     activity = db.Column(db.String(255))
     perubahan = db.Column(db.String(255))
-    time = db.DateTimeField(auto_now_add=True)
+    time = datetime.now()
