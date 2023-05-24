@@ -27,7 +27,7 @@ def create_app():
     api.init_app(app)
     login_manager.init_app(app)
 
-    from app.models.user import Users
+    from app.models.User import Users
 
     @login_manager.user_loader
     def load_user(user_id):

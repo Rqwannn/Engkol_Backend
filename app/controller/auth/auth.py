@@ -9,9 +9,10 @@ from app.models.User import Users
 
 # Bikin logika login di sini
 
+
 class Login(Resource):
     def post(self):
-        # Parsing data dari permintaan POST
+        # Parsing data dari POST
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str, required=True, help='Username is required')
         parser.add_argument('password', type=str, required=True, help='Password is required')
@@ -19,16 +20,18 @@ class Login(Resource):
 
         # Proses autentikasi
         username = args['username']
-        password = args['password']
+        password = check_password_hash(args['password'])
 
         user = Users.query.filter_by(username=username).first()
 
         if user and user.check_password_hash(password):
+
+            login_user(user)
+
             # Jika autentikasi berhasil
             return jsonify({
                 "Data": {
                     "Username": user.username,
-                    # data response lain
                 },
                 "Pesan": "Berhasil",
                 "Status": 200
@@ -39,6 +42,7 @@ class Login(Resource):
                 "Pesan": "Username atau password salah",
                 "Status": 401
             })
+
 
 
     
