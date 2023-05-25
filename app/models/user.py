@@ -3,8 +3,7 @@ from datetime import datetime
 from app import db
 import uuid
 
-from app.models.bussines_plan import Postal_Code_Address
-
+from app.models.bussines_plan import Postal_code_address
 
 class Users(db.Model, UserMixin):
     user_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
@@ -14,11 +13,14 @@ class Users(db.Model, UserMixin):
     profile = db.relationship("profile", backref='profile', lazy=True, uselist=True)
     is_deleted = db.Column(db.Boolean)
 
-class UsersHistory(db.Model):
+class Users_history(db.Model):
     user_history = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
     description = db.Column(db.Text)
     history_date = db.Column(db.DateTime, default=datetime.utcnow())
+
+class Postal_code_address(db.Model):
+    postal_code = db.Column(db.String(36), primary_key=True)
 
 class Profile(db.Model):
     profile_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
