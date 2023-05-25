@@ -51,4 +51,4 @@ class Bookeeping_ticket(db.Model):
     bookeeping_ticket_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     bussines_plan_id = db.Column(db.String(36), db.ForeignKey('bussines_plan.bussines_plan_id'), nullable=False)
     money_bookeeping_id = db.Column(db.String(36), db.ForeignKey('money_bookeeping.money_bookeeping_id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = datetime.now()
