@@ -9,7 +9,8 @@ class Money_bookeeping(db.Model):
     category_id = db.Column(db.Integer)  # ubah
     description = db.Column(db.Text)
     balances = db.Column(db.Integer)
-    id_deleted = db.Column(db.Boolean)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    is_deleted = db.Column(db.Boolean)
 
 class Bookeeping_account(db.Model):
     bookeeping_account_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
@@ -25,6 +26,7 @@ class Money_bookeeping_role(db.Model):
     role_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     role_name = db.Column(db.String(25))
     role_status = db.Column(db.String(2))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Activity_role(db.Model):
     activity_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
@@ -32,3 +34,4 @@ class Activity_role(db.Model):
     activity = db.Column(db.String(255))
     perubahan = db.Column(db.String(255))
     time = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())

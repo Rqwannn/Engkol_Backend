@@ -11,6 +11,7 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(30))
     profile = db.relationship("profile", backref='profile', lazy=True, uselist=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
     is_deleted = db.Column(db.Boolean)
 
 class Users_history(db.Model):
@@ -18,9 +19,10 @@ class Users_history(db.Model):
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
     description = db.Column(db.Text)
     history_date = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-class Postal_code_address(db.Model):
-    postal_code = db.Column(db.String(36), primary_key=True)
+#class Postal_code_address(db.Model):
+#   postal_code = db.Column(db.String(36), primary_key=True)
 
 class Profile(db.Model):
     profile_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
@@ -31,3 +33,4 @@ class Profile(db.Model):
     telephone_number = db.Column(db.String(15))
     postal_code = db.Column(db.String(36), db.ForeignKey('postal_code_address.postal_code'), nullable=False)
     address = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
