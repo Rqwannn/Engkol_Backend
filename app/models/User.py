@@ -11,6 +11,7 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(30))
     profile = db.relationship("profile", backref='profile', lazy=True, uselist=True)
+    user_history = db.relationship("user_history", backref='user_history', lazy=True, uselist=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
     is_deleted = db.Column(db.Boolean)
 
