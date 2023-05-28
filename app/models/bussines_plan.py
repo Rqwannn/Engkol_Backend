@@ -21,10 +21,12 @@ class Bussiness_plan(db.Model):
 
 class Postal_code_address(db.Model):
     postal_code = db.Column(db.String(36), primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Provinces_list(db.Model):
     province_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     province_name = db.Column(db.String(30))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Regencys_list(db.Model):
     regency_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
