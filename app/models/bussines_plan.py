@@ -17,25 +17,19 @@ class Bussiness_plan(db.Model):
     target_market = db.Column(db.String(50))
     status = db.Column(db.Boolean)
     is_deleted = db.Column(db.Boolean)
-    bookeeping_ticket = db.relationship("bookeeping_ticket", backref="bookeeping_ticket", lazy=True, uselist = True)
-    pivot_bussines_bookkeeping = db.relationship("pivot_bussines_bookkeeping", backref="pivot_bussines_bookkeeping", lazy=True, uselist=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Postal_code_address(db.Model):
     postal_code = db.Column(db.String(36), primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Provinces_list(db.Model):
     province_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     province_name = db.Column(db.String(30))
-    regencys_list = db.relationship("regencys_list", backref="regencys_list", lazy=True, uselist=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Regencys_list(db.Model):
     regency_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     regencys_name = db.Column(db.String(30))
     provincy_id = db.Column(db.String(36), db.ForeignKey('provinces_list.province_id'), nullable=False)
-    subdistricts_list = db.relationship("subdistricts_list", backref="subdistricts_list", lazy=True, uselist=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Subdistricts_list(db.Model):
@@ -60,6 +54,6 @@ class Pivot_bussines_bookkeeping(db.Model):
 
 class Bookeeping_ticket(db.Model):
     bookeeping_ticket_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    bussines_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussines_plan_id'), nullable=False)
+    bussines_plan_id = db.Column(db.String(36), db.ForeignKey('bussines_plan.bussines_plan_id'), nullable=False)
     money_bookeeping_id = db.Column(db.String(36), db.ForeignKey('money_bookeeping.money_bookeeping_id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = datetime.now()

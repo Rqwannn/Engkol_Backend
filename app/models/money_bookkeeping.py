@@ -11,6 +11,7 @@ class Money_bookeeping(db.Model):
     balances = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
     is_deleted = db.Column(db.Boolean)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Bookeeping_account(db.Model):
     bookeeping_account_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
@@ -20,8 +21,9 @@ class Bookeeping_account(db.Model):
     # role_id = db.Column(db.String(50), db.ForeignKey('money_bookeeping_role.role_id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
     # created_at = db.Column(db.DateTime, server_default=db.func.now())
-    deleted_at = db.Column(db.DateTime, default=datetime.utcnow())
     activity_role = db.relationship("activity_role", backref="activity_role", lazy=True, uselist=True)
+    deleted_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
 class Money_bookeeping_role(db.Model):
     role_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
