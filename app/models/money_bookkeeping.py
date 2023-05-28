@@ -34,5 +34,4 @@ class Activity_role(db.Model):
     money_bookeeping_account = db.Column(db.String(36), db.ForeignKey('bookeeping_account.bookeeping_account_id'))
     activity = db.Column(db.String(255))
     perubahan = db.Column(db.String(255))
-    time = db.Column(db.DateTime, default=datetime.utcnow())
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
