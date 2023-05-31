@@ -3,7 +3,7 @@ from datetime import datetime
 from app import db
 import uuid
 
-from app.models.bussines_plan import Postal_code_address
+from app.models.postal_code import Postal_code_address
 
 class Users(db.Model, UserMixin):
     user_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
