@@ -12,6 +12,7 @@ from app.models.User import Users
 
 class Login(Resource):
     def post(self):
+        return jsonify({"test":"test"})
         # Parsing data dari POST
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str, required=True, help='Username is required')
@@ -50,6 +51,7 @@ class Login(Resource):
 
 class Register(Resource):
     def post(self):
+        return jsonify({"tes":"tes"})
         # Ambil data dari permintaan POST
         username = request.form.get('username')
         password = generate_password_hash(request.form.get('password'))

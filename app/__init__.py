@@ -18,7 +18,7 @@ def create_app():
 
     db.init_app(app)
 
-    Talisman(app, content_security_policy=None, force_https=True, strict_transport_security=True)
+    # Talisman(app, content_security_policy=None, force_https=True, strict_transport_security=True)
 
     from app.urls import __URLPATH__
 

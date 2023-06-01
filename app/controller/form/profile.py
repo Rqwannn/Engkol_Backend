@@ -27,22 +27,22 @@ class ProfileResource(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('user_id', type=str, required=True)
+        # parser.add_argument('user_id', type=str, required=True)
         parser.add_argument('first_name', type=str, required=True)
         parser.add_argument('last_name', type=str, required=True)
         parser.add_argument('birth_date', type=str, required=True)
         parser.add_argument('telephone_number', type=str, required=True)
-        parser.add_argument('postal_code', type=str, required=True)
+        # parser.add_argument('postal_code', type=str, required=True)
         parser.add_argument('address', type=str, required=True)
         args = parser.parse_args()
 
         profile = Profile(
-            user_id=args['user_id'],
+            # user_id=args['user_id'],
             first_name=args['first_name'],
             last_name=args['last_name'],
             birth_date=datetime.strptime(args['birth_date'], '%d-%m-%Y').date(),
             telephone_number=args['telephone_number'],
-            postal_code=args['postal_code'],
+            # postal_code=args['postal_code'],
             address=args['address']
         )
 
