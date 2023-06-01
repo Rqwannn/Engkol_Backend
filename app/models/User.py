@@ -15,6 +15,9 @@ class Users(db.Model, UserMixin):
 #     is_deleted = db.Column(db.Boolean)
 #     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
+    def get_id(self):
+        return str(self.user_id)
+
 # class Users_history(db.Model):
 #     user_history = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
 #     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)

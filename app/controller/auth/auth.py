@@ -13,59 +13,43 @@ from app.models.User import Users
 
 class Login(Resource):
     def post(self):
-        return jsonify({"test":"test"})
         # Parsing data dari POST
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str, required=True, help='Username is required')
         parser.add_argument('password', type=str, required=True, help='Password is required')
         args = parser.parse_args()
 
-        # Proses autentikasi
+        # Validasi data
         username = args['username']
-        password = check_password_hash(args['password'])
+        password = args['password']
 
+        if not username or not password:
+            return {
+                "Pesan": "Username dan password harus diisi",
+                "Status": 400
+            }
+
+        # Proses autentikasi
         user = Users.query.filter_by(username=username).first()
 
-        if user and user.check_password_hash(password):
-
+        if user and check_password_hash(user.password, password):
             login_user(user)
 
             # Jika autentikasi berhasil
-            return jsonify({
+            return {
                 "Data": {
                     "Username": user.username,
                 },
                 "Pesan": "Berhasil",
                 "Status": 200
-            })
+            }
         else:
             # Jika autentikasi gagal
-            return jsonify({
+            return {
                 "Pesan": "Username atau password salah",
                 "Status": 401
-            })
+            }
 
-
-
-    
-# Bikin logika register di sini
-# class Register(Resource):
-#     def post(self):
-#             parser = reqparse.RequestParser()
-#             parser.add_argument('username', type=str, required=True)
-#             parser.add_argument('password', type=str, required=True)
-#             args = parser.parse_args()
-
-#             users = Users(
-#                 # user_id=args['user_id'],
-#                 username=args['username'],
-#                 password=generate_password_hash(args['password']),
-#             )
-
-#             db.session.add(users)
-#             db.session.commit()
-
-#             return {'message': 'Profile created successfully'}, 201
 
 class Register(Resource):
     def post(self):
@@ -78,6 +62,12 @@ class Register(Resource):
             return jsonify({
                 "Pesan": "Username dan password harus diisi",
                 "Status": 400
+            })
+        
+        if len(password) < 6:
+            return jsonify({
+                "Pesan" : "Password harus memiliki setidaknya 6 digit karakter",
+                "Status" : 400
             })
 
         # Simpan data ke database
