@@ -22,8 +22,8 @@ def create_app():
     Talisman(app, content_security_policy=None, force_https=True, strict_transport_security=True)
 
     # atur origins (domain yang di izinkan) jika sudah tahap produksi
-
     CORS(app, resources={r"/*": {"origins": "*"}})
+
 
     from app.urls import __URLPATH__
 

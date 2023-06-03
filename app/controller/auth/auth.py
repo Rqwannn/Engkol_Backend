@@ -20,7 +20,7 @@ class Login(Resource):
 
         # Proses autentikasi
         username = args['username']
-        password = check_password_hash(args['password'])
+        password = args['password']
 
         user = Users.query.filter_by(username=username).first()
 
@@ -30,17 +30,15 @@ class Login(Resource):
 
             # Jika autentikasi berhasil
             return jsonify({
-                "Data": {
-                    "Username": user.username,
-                },
-                "Pesan": "Berhasil",
-                "Status": 200
+                "username": user.username,
+                "status": 200,
+                "pesan": "Berhasil",
             })
         else:
             # Jika autentikasi gagal
             return jsonify({
-                "Pesan": "Username atau password salah",
-                "Status": 401
+                "status": 401,
+                "pesan": "Gagal",
             })
 
 
