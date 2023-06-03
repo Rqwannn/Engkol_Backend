@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_restful import Api
 from flask_talisman import Talisman
 from flask_login import LoginManager
+from flask_cors import CORS
 
 db = SQLAlchemy()
 api = Api()
@@ -19,6 +20,10 @@ def create_app():
     db.init_app(app)
 
     Talisman(app, content_security_policy=None, force_https=True, strict_transport_security=True)
+
+    # atur origins (domain yang di izinkan) jika sudah tahap produksi
+
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
     from app.urls import __URLPATH__
 
