@@ -10,7 +10,7 @@ class Users(db.Model, UserMixin):
     username = db.Column(db.String(30), unique=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(30))
-    profile = db.relationship("profile", backref='profile', lazy=True, uselist=True)
+    profile = db.relationship("profile", backref='user', lazy=True, uselist=True)
     user_history = db.relationship("user_history", backref='user_history', lazy=True, uselist=True)
     is_deleted = db.Column(db.Boolean)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())

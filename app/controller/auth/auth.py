@@ -1,11 +1,12 @@
-from flask import request, abort, jsonify, current_app
-from flask_restful import Resource, reqparse, fields, marshal_with
+from flask import request, jsonify
+from flask_restful import Resource, reqparse
 from flask.config import Config
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user
 
 from app.models.User import Users
+from app import db
 
 # Bikin logika login di sini
 
@@ -24,13 +25,14 @@ class Login(Resource):
 
         user = Users.query.filter_by(username=username).first()
 
-        if user and user.check_password_hash(password):
+        if user and check_password_hash(user.password, password):
 
             login_user(user)
 
             # Jika autentikasi berhasil
+
             return jsonify({
-                "username": user.username,
+                "UserData": user,
                 "status": 200,
                 "pesan": "Berhasil",
             })
@@ -61,7 +63,9 @@ class Register(Resource):
 
         # Simpan data ke database
         user = Users(username=username, password=password)
-        user.save()  
+
+        db.session.add(user)
+        db.session.commit()
 
         # Return JSON response
         return jsonify({
