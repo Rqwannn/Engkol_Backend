@@ -32,9 +32,9 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         
+        load_user(user_id)
         # since the user_id is just the primary key of our user table, use it in the query for the user
-
-        return Users.query.get(int(user_id))
+        return Users.query.filter_by(user_id=user_id).first()
 
     Migrate(app, db)
 

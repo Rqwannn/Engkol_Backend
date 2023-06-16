@@ -1,10 +1,11 @@
-from flask import request, abort, jsonify, current_app
+from flask import request, abort, jsonify, session
 from flask_restful import Resource, reqparse, fields, marshal_with
 from flask.config import Config
+from flask_login import current_user
 
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user
+from flask_login import login_user, logout_user
 
 from app.models.User import Users
 
