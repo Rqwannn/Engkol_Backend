@@ -2,6 +2,8 @@ from flask_login import UserMixin
 from datetime import datetime
 from app import db
 import uuid
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 
 class Users(db.Model, UserMixin):
     user_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
@@ -32,7 +34,7 @@ class Owner_profile(db.Model):
     
 class Users_history(db.Model):
      user_history_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
+    #  user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
      description = db.Column(db.Text)
      history_date = db.Column(db.DateTime, default=datetime.utcnow())
      created_at = db.Column(db.DateTime, default=datetime.utcnow())
@@ -129,6 +131,7 @@ class Bookkeeping_asets(db.Model):
 class Postal_code_address(db.Model):
     postal_code = db.Column(db.String(36), primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    owner_profile = db.relationship("owner_profile", backref="owner_profile", lazy=True, uselist=False)
     # pivot_postal_code_location = db.relationship("pivot_postal_code_location", backref="pivot_postal_code_location", lazy=True, uselist=False)
 
     def get_id(self):

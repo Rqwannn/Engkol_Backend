@@ -8,7 +8,7 @@ from app import db
 
 from app.models.User import *
 
-class bookkeepingResource(Resource):
+class BookkeepingAccountResource(Resource):
     def get(self, bookkeeping_account_id):
         bookkeeping = bookkeeping_account.query.get(bookkeeping_account_id)
         if bookkeeping:
