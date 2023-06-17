@@ -10,7 +10,7 @@ from app.models.User import *
 
 class BookkeepingAccountResource(Resource):
     def get(self, bookkeeping_account_id):
-        bookkeeping = bookkeeping_account.query.get(bookkeeping_account_id)
+        bookkeeping = Bookkeeping_account.query.get(bookkeeping_account_id)
         if bookkeeping:
             return {
                 'data': bookkeeping,
@@ -28,7 +28,7 @@ class BookkeepingAccountResource(Resource):
         parser.add_argument('name_account', type=str, required=True)
         args = parser.parse_args()
 
-        bookkeeping = bookkeeping_account(
+        bookkeeping = Bookkeeping_account(
             bookkeeping_ticket_id=args['bookkeeping_ticket_id'],
             role_id=args['role_id'],
             activity=args['activity'],
@@ -52,7 +52,7 @@ class BookkeepingAccountResource(Resource):
         parser.add_argument('name_account', type=str, required=True)
         args = parser.parse_args()
 
-        bookkeeping = bookkeeping_account.query.get(bookkeeping_id)
+        bookkeeping = Bookkeeping_account.query.get(bookkeeping_id)
         if bookkeeping:
             bookkeeping.bookkeeping_ticket_id = args['bookkeeping_ticket_id']
             bookkeeping.role_id = args['role_id']
@@ -66,7 +66,7 @@ class BookkeepingAccountResource(Resource):
             return {'message': 'bookkeeping not found'}, 404
 
     def delete(self, bookkeeping_id):
-        bookkeeping = bookkeeping_account.query.get(bookkeeping_id)
+        bookkeeping = Bookkeeping_account.query.get(bookkeeping_id)
         if bookkeeping:
             db.session.delete(bookkeeping)
             db.session.commit()
@@ -76,14 +76,14 @@ class BookkeepingAccountResource(Resource):
 
 
 class BookkeepingRoleResource(Resource):
-    def get(self, BookkeepingRole_id):
-        BookkeepingRole = Money_bookkeeping_role.query.get(BookkeepingRole_id)
-        if BookkeepingRole:
+    def get(self, bookkeeping_role_id):
+        bookkeeping_role = Money_bookkeeping_role.query.get(bookkeeping_role_id)
+        if bookkeeping_role:
             return {
-                'data': BookkeepingRole,
+                'data': bookkeeping_role,
             }
         else:
-            return {'message': 'BookkeepingRole not found'}, 404
+            return {'message': 'bookkeeping role not found'}, 404
 
     def post(self):
         parser = reqparse.RequestParser()
@@ -93,50 +93,50 @@ class BookkeepingRoleResource(Resource):
 
         print(current_user)
 
-        BookkeepingRole = Money_bookkeeping_role(
+        bookkeeping_role = Money_bookkeeping_role(
             role_name=args['role_name'],
             role_status=args['role_status']
         )
 
-        db.session.add(BookkeepingRole)
+        db.session.add(bookkeeping_role)
         db.session.commit()
 
-        return {'message': 'BookkeepingRole created successfully'}, 201
+        return {'message': 'bookkeeping role created successfully'}, 201
 
-    def put(self, BookkeepingRole_id):
+    def put(self, bookkeeping_role_id):
         parser = reqparse.RequestParser()
         parser.add_argument('role_name', type=str, required=True)
         parser.add_argument('role_status', type=str, required=True)
         args = parser.parse_args()
 
-        BookkeepingRole = Money_bookkeeping_role.query.get(BookkeepingRole_id)
-        if BookkeepingRole:
-            BookkeepingRole.role_name = args['role_name']
-            BookkeepingRole.role_status = args['role_status']
+        bookkeeping_role = Money_bookkeeping_role.query.get(bookkeeping_role_id)
+        if bookkeeping_role:
+            bookkeeping_role.role_name = args['role_name']
+            bookkeeping_role.role_status = args['role_status']
             db.session.commit()
-            return {'message': 'BookkeepingRole updated successfully'}
+            return {'message': 'bookkeeping role updated successfully'}
         else:
-            return {'message': 'BookkeepingRole not found'}, 404
+            return {'message': 'bookkeeping role not found'}, 404
 
-    def delete(self, BookkeepingRole_id):
-        BookkeepingRole = Money_bookkeeping_role.query.get(BookkeepingRole_id)
-        if BookkeepingRole:
-            db.session.delete(BookkeepingRole)
+    def delete(self, bookkeeping_role_id):
+        bookkeeping_role = Money_bookkeeping_role.query.get(bookkeeping_role_id)
+        if bookkeeping_role:
+            db.session.delete(bookkeeping_role)
             db.session.commit()
-            return {'message': 'BookkeepingRole deleted successfully'}
+            return {'message': 'bookkeeping role deleted successfully'}
         else:
-            return {'message': 'BookkeepingRole not found'}, 404
+            return {'message': 'bookkeeping role not found'}, 404
 
 
 class ActivityRoleResource(Resource):
-    def get(self, activity_id):
-        ActivityRole = Activity_role.query.get(activity_id)
-        if ActivityRole:
+    def get(self, activity_role_id):
+        activity_role = Activity_role.query.get(activity_role_id)
+        if activity_role:
             return {
-                'data': ActivityRole,
+                'data': activity_role,
             }
         else:
-            return {'message': 'ActivityRole not found'}, 404
+            return {'message': 'activity role not found'}, 404
 
     def post(self):
         parser = reqparse.RequestParser()
@@ -149,39 +149,39 @@ class ActivityRoleResource(Resource):
 
         print(current_user)
 
-        ActivityRole = Activity_role(
+        activity_role = Activity_role(
             money_bookkeeping_account=args['money_bookkeeping_account'],
             activity=args['activity'],
             perubahan=args['perubahan'],
         )
 
-        db.session.add(ActivityRole)
+        db.session.add(activity_role)
         db.session.commit()
 
-        return {'message': 'ActivityRole created successfully'}, 201
+        return {'message': 'activity role created successfully'}, 201
 
-    def put(self, activity_id):
+    def put(self, activity_role_id):
         parser = reqparse.RequestParser()
         parser.add_argument('money_bookkeeping_account', type=str, required=True)
         parser.add_argument('activity', type=str, required=True)
         parser.add_argument('perubahan', type=str, required=True)
         args = parser.parse_args()
 
-        ActivityRole = Activity_role.query.get(activity_id)
-        if ActivityRole:
-            ActivityRole.money_bookkeeping_account = args['money_bookkeeping_account']
-            ActivityRole.activity = args['activity']
-            ActivityRole.perubahan = args['perubahan']
+        activity_role = Activity_role.query.get(activity_role_id)
+        if activity_role:
+            activity_role.money_bookkeeping_account = args['money_bookkeeping_account']
+            activity_role.activity = args['activity']
+            activity_role.perubahan = args['perubahan']
             db.session.commit()
-            return {'message': 'ActivityRole updated successfully'}
+            return {'message': 'activity role updated successfully'}
         else:
-            return {'message': 'ActivityRole not found'}, 404
+            return {'message': 'activity role not found'}, 404
 
-    def delete(self, activity_id):
-        ActivityRole = Activity_role.query.get(activity_id)
-        if ActivityRole:
-            db.session.delete(ActivityRole)
+    def delete(self, activity_role_id):
+        activity_role = Activity_role.query.get(activity_role_id)
+        if activity_role:
+            db.session.delete(activity_role)
             db.session.commit()
-            return {'message': 'ActivityRole deleted successfully'}
+            return {'message': 'activity role deleted successfully'}
         else:
-            return {'message': 'ActivityRole not found'}, 404
+            return {'message': 'activity role not found'}, 404
