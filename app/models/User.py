@@ -246,6 +246,7 @@ class Bussiness_plan(db.Model, Base):
     bussiness_location = db.Column(db.String(100))
     # geolocation = db.Column(db.String(40))
     budgets = db.Column(db.String(100))
+    ai_message = db.Column(db.Text)
     # target_market = db.Column(db.String(100))
     # status = db.Column(db.String(50))
     is_deleted = db.Column(db.Integer)

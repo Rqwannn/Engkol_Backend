@@ -25,21 +25,22 @@ class OpenAIApi(Resource):
             parser.add_argument('budgets', type=str, required=True)
             args = parser.parse_args()
 
-            values = Bussiness_plan(
-                bussiness_type=args['bussiness_type'],
-                bussiness_location=args['bussiness_location'],
-                budgets=args['budgets']
-            )
-
             # connect to openAi
 
             app = current_app._get_current_object()
             openai.api_key = app.config['OPENAI_SECRET_KEY']
 
-            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": f"saya ingin membuka usaha bidang {args['bussiness_type']} di {args['bussiness_location']} dengan modal sebesar {args['budgets']}. berikan dua saran usaha yang cocok untuk saya, lokasi spesifik yang strategis, cara pemasarannya, dan tuntunan mencatat keuangannya secara sederhana"}])
+            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": f"saya ingin membuka usaha bidang {args['bussiness_type']} di {args['bussiness_location']} dengan modal sebesar {args['budgets']}. berikan dua saran usaha yang cocok untuk saya, lokasi spesifik yang strategis, dan cara pemasarannya"}])
             completed = completion.choices[0].message.content
+
+            values = Bussiness_plan(
+                bussiness_type=args['bussiness_type'],
+                bussiness_location=args['bussiness_location'],
+                budgets=args['budgets'],
+                ai_message=completed
+            )
 
             db.session.add(values)
             db.session.commit()
 
-            return jsonify(completed)
+            return jsonify(completed + "/n Agar perusahaan anda bisa berlangsung lama, sangat perlu melakukan pencatatan keuangan. Mencatat keuangan perusahaan bukanlah hal yang rumit, mencatat pengeluaran dan pemasukan harian sudah cukup untuk memulai mencatat keuangan. /n Anda dapat menggunakan fitur Pencatatan Keuangan yang tersedia di App Engkol yang sedang kamu gunakan ini.")
