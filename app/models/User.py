@@ -261,7 +261,7 @@ class Bussiness_plan(db.Model, Base):
 class Pivot_bussiness_bookkeeping(db.Model, Base):
     __tablename__ = 'pivot_bussiness_bookkeeping'
 
-    pivot_bussiness_bookkeeping = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+    pivot_bussiness_bookkeeping_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
     bookkeeping_account_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow())

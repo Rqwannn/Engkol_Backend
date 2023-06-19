@@ -1,7 +1,7 @@
 from flask import request, abort, jsonify, session
 from flask_restful import Resource, reqparse, fields, marshal_with
 from flask.config import Config
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -35,7 +35,7 @@ class Login(Resource):
         user = Users.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            login_user(user)
+            login_user(user, remember=True)
 
             # Jika autentikasi berhasil
             return {
@@ -45,12 +45,15 @@ class Login(Resource):
                 "Pesan": "Berhasil",
                 "Status": 200
             }
+            
         else:
             # Jika autentikasi gagal
             return {
                 "Pesan": "Username atau password salah",
                 "Status": 401
             }
+            
+
 
 
 class Register(Resource):

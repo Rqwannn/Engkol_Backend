@@ -5,6 +5,7 @@ from flask import Flask, session
 from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from app import db
+from flask_login import login_user, login_required
 
 from app.models.User import Owner_profile, Users
 
@@ -19,6 +20,7 @@ class ProfileResource(Resource):
             return {'message': 'Profile not found'}, 404
 
     def post(self):
+
         parser = reqparse.RequestParser()
         parser.add_argument('user_id', type=str, required=True)
         parser.add_argument('first_name', type=str, required=True)
@@ -32,7 +34,7 @@ class ProfileResource(Resource):
         print(current_user)
 
         profile = Owner_profile(
-            user_id=current_user.user_id,
+            user_id=args['user_id'],
             first_name=args['first_name'],
             last_name=args['last_name'],
             birth_date=datetime.strptime(args['birth_date'], '%d-%m-%Y').date(),
@@ -45,6 +47,7 @@ class ProfileResource(Resource):
         db.session.commit()
 
         return {'message': 'Profile created successfully'}, 201
+
 
     def put(self, profile_id):
         parser = reqparse.RequestParser()
