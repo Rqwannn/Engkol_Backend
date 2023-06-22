@@ -14,6 +14,12 @@ from app.models.User import Users
 
 
 class Login(Resource):
+
+    def get(self):
+        print(current_user)
+        print(session)
+        print("faizal")
+
     def post(self):
         # Parsing data dari POST
         parser = reqparse.RequestParser()
@@ -37,6 +43,8 @@ class Login(Resource):
         if user and check_password_hash(user.password, password):
             login_user(user, remember=True)
 
+            print(current_user)
+
             # Jika autentikasi berhasil
             return {
                 "Data": {
@@ -52,8 +60,8 @@ class Login(Resource):
                 "Pesan": "Username atau password salah",
                 "Status": 401
             }
-            
 
+    
 
 
 class Register(Resource):
@@ -80,10 +88,13 @@ class Register(Resource):
         db.session.add(user)
         db.session.commit()
 
+        user_id = user.user_id
+        
+
         # Return JSON response
         return jsonify({
-            "Data": {
-                "Username": username
+            "data":{
+                "user_id":user_id,
             },
             "Pesan": "Registrasi berhasil",
             "Status": 200

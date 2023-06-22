@@ -21,6 +21,15 @@ class ProfileResource(Resource):
 
     def post(self):
 
+        user_id = current_user
+
+        profile = Profile.query.filter_by(user_id=user_id).first()
+
+        if profile:
+            return {"status":"1"}
+        else:
+            return {"status":"0"}
+
         parser = reqparse.RequestParser()
         parser.add_argument('user_id', type=str, required=True)
         parser.add_argument('first_name', type=str, required=True)
