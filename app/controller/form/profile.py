@@ -23,7 +23,7 @@ class ProfileResource(Resource):
 
         user_id = current_user
 
-        profile = Profile.query.filter_by(user_id=user_id).first()
+        profile = Owner_rofile.query.filter_by(user_id=user_id).first()
 
         if profile:
             return {"status":"1"}

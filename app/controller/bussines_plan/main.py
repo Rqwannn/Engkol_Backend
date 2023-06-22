@@ -7,19 +7,19 @@ import openai
 from app.models.User import Bussiness_plan
 
 class OpenAIApi(Resource):
-    def get(self):
 
-        app = current_app._get_current_object()
-        openai.api_key = app.config['OPENAI_SECRET_KEY']
-
-        completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hai chatgpt"}])
-        completed = completion.choices[0].message.content
-        return jsonify(completed)
-
-    # class openai get post
+    def get(self, bussiness_plan_id):
+        plan = Bussiness_plan.query.get(bussiness_plan_id)
+        if plan:
+            return {
+                'data': plan,
+            }
+        else:
+            return {'message': 'bookkeeping not found'}, 404
 
     def post(self):
             parser = reqparse.RequestParser()
+            parser.add_argument('user_id', type=str, required=True)
             parser.add_argument('bussiness_type', type=str, required=True)
             parser.add_argument('bussiness_location', type=str, required=True)
             parser.add_argument('budgets', type=str, required=True)
@@ -34,6 +34,7 @@ class OpenAIApi(Resource):
             completed = completion.choices[0].message.content
 
             values = Bussiness_plan(
+                user_id=args['user_id'],
                 bussiness_type=args['bussiness_type'],
                 bussiness_location=args['bussiness_location'],
                 budgets=args['budgets'],

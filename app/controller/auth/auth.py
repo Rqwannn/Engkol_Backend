@@ -47,7 +47,8 @@ class Login(Resource):
 
             # Jika autentikasi berhasil
             return {
-                "Data": {
+                "data": {
+                    "user_id":user.user_id,
                     "Username": user.username,
                 },
                 "Pesan": "Berhasil",
@@ -87,14 +88,11 @@ class Register(Resource):
         user = Users(username=username, password=password)
         db.session.add(user)
         db.session.commit()
-
-        user_id = user.user_id
         
-
         # Return JSON response
         return jsonify({
             "data":{
-                "user_id":user_id,
+                "user_id":user.user_id,
             },
             "Pesan": "Registrasi berhasil",
             "Status": 200

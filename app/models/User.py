@@ -20,6 +20,8 @@ class Users(db.Model, UserMixin, Base):
 
     owner_profile = relationship("Owner_profile", backref='users', lazy=True)
     user_history = relationship("Users_history", backref='users', lazy=True)
+    bussiness_plan = relationship("Bussiness_plan", backref="users", lazy=True)
+
 
     def get_id(self):
         return str(self.user_id)
@@ -240,7 +242,8 @@ class Bussiness_plan(db.Model, Base):
     __tablename__ = 'bussiness_plan'
 
     bussiness_plan_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    # bussiness_email = db.Column(db.String(100), unique=True)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
+    bussiness_email = db.Column(db.String(100))
     bussiness_type = db.Column(db.String(50))
     # postal_code = db.Column(db.String(36))
     bussiness_location = db.Column(db.String(100))
@@ -248,7 +251,7 @@ class Bussiness_plan(db.Model, Base):
     budgets = db.Column(db.String(100))
     ai_message = db.Column(db.Text)
     # target_market = db.Column(db.String(100))
-    # status = db.Column(db.String(50))
+    status = db.Column(db.String(50))
     is_deleted = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
