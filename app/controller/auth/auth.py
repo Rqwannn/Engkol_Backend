@@ -1,24 +1,20 @@
 from flask import request, abort, jsonify, session
 from flask_restful import Resource, reqparse, fields, marshal_with
 from flask.config import Config
-from flask_login import current_user, login_required
-
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 from app.models.User import Users
 
-
 # Bikin logika login di sini
-
 
 class Login(Resource):
 
+    @jwt_required()
     def get(self):
-        print(current_user)
-        print(session)
-        print("faizal")
+        current_user = get_jwt_identity()
+        return jsonify(logged_in_as=current_user), 200
 
     def post(self):
         # Parsing data dari POST
@@ -41,20 +37,10 @@ class Login(Resource):
         user = Users.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            login_user(user, remember=True)
+            access_token = create_access_token(identity=username)
+            # print(get_jwt_identity())
+            return jsonify(access_token=access_token)
 
-            print(current_user)
-
-            # Jika autentikasi berhasil
-            return {
-                "data": {
-                    "user_id":user.user_id,
-                    "Username": user.username,
-                },
-                "Pesan": "Berhasil",
-                "Status": 200
-            }
-            
         else:
             # Jika autentikasi gagal
             return {
