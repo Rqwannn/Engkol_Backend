@@ -11,10 +11,17 @@ from app.models.User import Users
 
 class Login(Resource):
 
+
+    # get sekalian contoh
     @jwt_required()
     def get(self):
-        current_user = get_jwt_identity()
-        return jsonify(logged_in_as=current_user), 200
+        username = get_jwt_identity()
+        user = Users.query.filter_by(username=username).first()
+
+        if not user:
+            return {"message":"user not found"}, 404
+
+        return {"user_id":user.user_id}, 200
 
     def post(self):
         # Parsing data dari POST
@@ -47,8 +54,6 @@ class Login(Resource):
                 "Pesan": "Username atau password salah",
                 "Status": 401
             }
-
-    
 
 
 class Register(Resource):
@@ -83,4 +88,3 @@ class Register(Resource):
             "Pesan": "Registrasi berhasil",
             "Status": 200
         })
-
