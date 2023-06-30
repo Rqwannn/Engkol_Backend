@@ -5,33 +5,38 @@ from flask import Flask, session
 from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from app import db
-from flask_login import login_user, login_required
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 from app.models.User import Owner_profile, Users
 
 class ProfileResource(Resource):
-    def get(self, profile_id):
-        profile = Owner_profile.query.get(profile_id)
-        if profile:
-            return {
-                'data': profile,
-            }
-        else:
-            return {'message': 'Profile not found'}, 404
+    
+    @jwt_required()
+    def get(self):
+        username = get_jwt_identity()
+        user = Users.query.filter_by(username=username).first()
 
+        if not user:
+            return {"message":"user not found"}, 404
+
+        profile = Owner_profile.query.filter_by(user_id=user.user_id).first()
+
+        if not profile:
+             return {"status":"0"}
+        else:
+             return {"status":"1"}        
+
+    @jwt_required()
     def post(self):
+        username = get_jwt_identity()
+        user = Users.query.filter_by(username=username).first()
 
-        user_id = current_user
+        if not user:
+            return {"message":"user not found"}, 404
 
-        profile = Owner_rofile.query.filter_by(user_id=user_id).first()
-
-        if profile:
-            return {"status":"1"}
-        else:
-            return {"status":"0"}
+        profile = Owner_profile.query.filter_by(user_id=user.user_id).first()
 
         parser = reqparse.RequestParser()
-        parser.add_argument('user_id', type=str, required=True)
         parser.add_argument('first_name', type=str, required=True)
         parser.add_argument('last_name', type=str, required=True)
         parser.add_argument('birth_date', type=str, required=True)
@@ -40,10 +45,8 @@ class ProfileResource(Resource):
         parser.add_argument('address', type=str, required=True)
         args = parser.parse_args()
 
-        print(current_user)
-
         profile = Owner_profile(
-            user_id=args['user_id'],
+            user_id=user.user_id,
             first_name=args['first_name'],
             last_name=args['last_name'],
             birth_date=datetime.strptime(args['birth_date'], '%d-%m-%Y').date(),
@@ -57,19 +60,29 @@ class ProfileResource(Resource):
 
         return {'message': 'Profile created successfully'}, 201
 
+    @jwt_required()
+    def put(self):
 
-    def put(self, profile_id):
+        username = get_jwt_identity()
+        user = Users.query.filter_by(username=username).first()
+
+        if not user:
+            return {"message":"user not found"}, 404
+
+        profile = Owner_profile.query.filter_by(user_id=user.user_id).first()
+        
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=str, required=True)
-        parser.add_argument('last_name', type=str, required=True)
-        parser.add_argument('birth_date', type=str, required=True)
+        parser.add_argument('last_name', type=str)
+        parser.add_argument('birth_date', type=str)
         parser.add_argument('telephone_number', type=str, required=True)
         parser.add_argument('postal_code', type=str, required=True)
         parser.add_argument('address', type=str, required=True)
         args = parser.parse_args()
 
-        profile = Owner_profile.query.get(profile_id)
-        if profile:
+        if not profile:
+            return {'message': 'Profile not found'}, 404
+        else:
             profile.first_name = args['first_name']
             profile.last_name = args['last_name']
             profile.birth_date = datetime.strptime(args['birth_date'], '%d-%m-%Y').date()
@@ -77,15 +90,5 @@ class ProfileResource(Resource):
             profile.postal_code = args['postal_code']
             profile.address = args['address']
             db.session.commit()
-            return {'message': 'Profile updated successfully'}
-        else:
-            return {'message': 'Profile not found'}, 404
 
-    def delete(self, profile_id):
-        profile = Owner_profile.query.get(profile_id)
-        if profile:
-            db.session.delete(profile)
-            db.session.commit()
-            return {'message': 'Profile deleted successfully'}
-        else:
-            return {'message': 'Profile not found'}, 404
+            return {'message': 'Profile updated successfully'}
