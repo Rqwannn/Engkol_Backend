@@ -13,13 +13,9 @@ class ProfileResource(Resource):
     
     @jwt_required()
     def get(self):
-        username = get_jwt_identity()
-        user = Users.query.filter_by(username=username).first()
+        user_id = get_jwt_identity()
 
-        if not user:
-            return {"message":"user not found"}, 404
-
-        profile = Owner_profile.query.filter_by(user_id=user.user_id).first()
+        profile = Owner_profile.query.filter_by(user_id=user_id).first()
 
         if not profile:
              return {"status":"0"}
@@ -28,13 +24,9 @@ class ProfileResource(Resource):
 
     @jwt_required()
     def post(self):
-        username = get_jwt_identity()
-        user = Users.query.filter_by(username=username).first()
+        user_id = get_jwt_identity()
 
-        if not user:
-            return {"message":"user not found"}, 404
-
-        profile = Owner_profile.query.filter_by(user_id=user.user_id).first()
+        profile = Owner_profile.query.filter_by(user_id=user_id).first()
 
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=str, required=True)
@@ -46,7 +38,7 @@ class ProfileResource(Resource):
         args = parser.parse_args()
 
         profile = Owner_profile(
-            user_id=user.user_id,
+            user_id=user_id,
             first_name=args['first_name'],
             last_name=args['last_name'],
             birth_date=datetime.strptime(args['birth_date'], '%d-%m-%Y').date(),
@@ -63,13 +55,9 @@ class ProfileResource(Resource):
     @jwt_required()
     def put(self):
 
-        username = get_jwt_identity()
-        user = Users.query.filter_by(username=username).first()
+        user_id = get_jwt_identity()
 
-        if not user:
-            return {"message":"user not found"}, 404
-
-        profile = Owner_profile.query.filter_by(user_id=user.user_id).first()
+        profile = Owner_profile.query.filter_by(user_id=user_id).first()
         
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=str, required=True)

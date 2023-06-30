@@ -15,13 +15,8 @@ class Login(Resource):
     # get sekalian contoh
     @jwt_required()
     def get(self):
-        username = get_jwt_identity()
-        user = Users.query.filter_by(username=username).first()
-
-        if not user:
-            return {"message":"user not found"}, 404
-
-        return {"user_id":user.user_id}, 200
+        user_id = get_jwt_identity()
+        return {"user_id":user_id}, 200
 
     def post(self):
         # Parsing data dari POST
@@ -44,7 +39,7 @@ class Login(Resource):
         user = Users.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            access_token = create_access_token(identity=username)
+            access_token = create_access_token(identity=user.user_id)
             # print(get_jwt_identity())
             return jsonify(access_token=access_token)
 
