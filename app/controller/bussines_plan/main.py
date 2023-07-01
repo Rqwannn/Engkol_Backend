@@ -57,3 +57,17 @@ class OpenAIApi(Resource):
             db.session.commit()
 
             return jsonify(completed + "/n Agar perusahaan anda bisa berlangsung lama, sangat perlu melakukan pencatatan keuangan. Mencatat keuangan perusahaan bukanlah hal yang rumit, mencatat pengeluaran dan pemasukan harian sudah cukup untuk memulai mencatat keuangan. /n Anda dapat menggunakan fitur Pencatatan Keuangan yang tersedia di App Engkol yang sedang kamu gunakan ini.")
+
+
+    @jwt_required()
+    def delete(self):
+        user_id=get_jwt_identity()
+
+        values=Business_plan(
+            is_deleted=1
+        )
+
+        db.session.add(values)
+        db.session.commit()
+
+        return {'msg':'data dihapus'}
