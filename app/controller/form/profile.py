@@ -26,8 +26,6 @@ class ProfileResource(Resource):
     def post(self):
         user_id = get_jwt_identity()
 
-        profile = Owner_profile.query.filter_by(user_id=user_id).first()
-
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=str, required=True)
         parser.add_argument('last_name', type=str, required=True)
@@ -54,10 +52,7 @@ class ProfileResource(Resource):
 
     @jwt_required()
     def put(self):
-
         user_id = get_jwt_identity()
-
-        profile = Owner_profile.query.filter_by(user_id=user_id).first()
         
         parser = reqparse.RequestParser()
         parser.add_argument('first_name', type=str, required=True)

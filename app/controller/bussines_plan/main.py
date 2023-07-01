@@ -2,24 +2,36 @@ from flask import request, abort, jsonify, current_app
 from flask_restful import Resource, reqparse, fields, marshal_with
 from flask.config import Config
 from app import db
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 import openai
 
 from app.models.User import Bussiness_plan
 
 class OpenAIApi(Resource):
 
-    def get(self, bussiness_plan_id):
-        plan = Bussiness_plan.query.get(bussiness_plan_id)
-        if plan:
-            return {
-                'data': plan,
-            }
-        else:
-            return {'message': 'bookkeeping not found'}, 404
+    @jwt_required()
+    def get(self):
+        user_id=get_jwt_identity()
 
+        data = Bussiness_plan.query.filter_by(user_id=user_id).all()
+
+        result = []
+        for plan in data:
+            result.append({
+                'bussiness_type':plan.bussiness_type,
+                'location': plan.bussiness_location,
+                'budget':plan.budgets,
+                'message':plan.ai_message
+            })
+
+        return {'business_plans': result}, 200
+
+
+    @jwt_required()
     def post(self):
+            user_id = get_jwt_identity()
+
             parser = reqparse.RequestParser()
-            parser.add_argument('user_id', type=str, required=True)
             parser.add_argument('bussiness_type', type=str, required=True)
             parser.add_argument('bussiness_location', type=str, required=True)
             parser.add_argument('budgets', type=str, required=True)
@@ -34,7 +46,7 @@ class OpenAIApi(Resource):
             completed = completion.choices[0].message.content
 
             values = Bussiness_plan(
-                user_id=args['user_id'],
+                user_id=user_id,
                 bussiness_type=args['bussiness_type'],
                 bussiness_location=args['bussiness_location'],
                 budgets=args['budgets'],
