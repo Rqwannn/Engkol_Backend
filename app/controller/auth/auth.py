@@ -1,19 +1,23 @@
 from flask import request, abort, jsonify, session
 from flask_restful import Resource, reqparse, fields, marshal_with
 from flask.config import Config
-from flask_login import current_user, login_required
-
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 from app.models.User import Users
 
-
 # Bikin logika login di sini
 
-
 class Login(Resource):
+
+
+    # get sekalian contoh
+    @jwt_required()
+    def get(self):
+        user_id = get_jwt_identity()
+        return {"user_id":user_id}, 200
+
     def post(self):
         # Parsing data dari POST
         parser = reqparse.RequestParser()
@@ -35,25 +39,16 @@ class Login(Resource):
         user = Users.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            login_user(user, remember=True)
+            access_token = create_access_token(identity=user.user_id)
+            # print(get_jwt_identity())
+            return jsonify(access_token=access_token)
 
-            # Jika autentikasi berhasil
-            return {
-                "Data": {
-                    "Username": user.username,
-                },
-                "Pesan": "Berhasil",
-                "Status": 200
-            }
-            
         else:
             # Jika autentikasi gagal
             return {
                 "Pesan": "Username atau password salah",
                 "Status": 401
             }
-            
-
 
 
 class Register(Resource):
@@ -79,13 +74,12 @@ class Register(Resource):
         user = Users(username=username, password=password)
         db.session.add(user)
         db.session.commit()
-
+        
         # Return JSON response
         return jsonify({
-            "Data": {
-                "Username": username
+            "data":{
+                "user_id":user.user_id,
             },
             "Pesan": "Registrasi berhasil",
             "Status": 200
         })
-
