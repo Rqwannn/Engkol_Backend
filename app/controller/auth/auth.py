@@ -12,59 +12,57 @@ from app.models.User import Users
 
 class Login(Resource):
     
-    # get sekalian contoh
-    @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
         return {"user_id":user_id}, 200
 
     def post(self):
-        # Parsing data dari POST
-        parser = reqparse.RequestParser()
-        parser.add_argument('username', type=str, required=True, help='Username is required')
-        parser.add_argument('email', type=str, required=True, help='email is required')
-        parser.add_argument('password', type=str, required=True, help='Password is required')
-        args = parser.parse_args()
 
         # Validasi data
-        username = args['username']
-        password = args['password']
+        username = request.json.get('username', None)
+        password = request.json.get('password', None)
 
         if not username or not password:
-            return {
+            return jsonify( {
                 "message": "Username dan password harus diisi",
                 "status": 400
-            }
-
+            })
+        
         # Proses autentikasi
         user = Users.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
             access_token = create_access_token(identity=user.user_id)
-            # print(get_jwt_identity())
-            return access_token
+            return jsonify( {
+                "token" : access_token,
+                "data": {
+                    "username": user.username,
+                    "email": user.email
+                },
+                "status": 200
+            } )
 
         else:
             # Jika autentikasi gagal
-            return {
+            return jsonify ( {
                 "Pesan": "Username atau password salah",
-                "Status": 401
-            }
+                "status": 401
+            } )
 
 
 class Register(Resource):
     def post(self):
         # fetch data
-        username = request.form.get('username')
-        password = request.form.get('password')
-        email = request.form.get('email')
+        username = request.json.get('username', None)
+        password = request.json.get('password', None)
+        email = request.json.get('email', None)
 
         # data validation
         if not username or not password:
-            return {"msg": "Username dan Password tidak boleh kosong!"}
+            return jsonify( {"message": "Username dan Password tidak boleh kosong!"} )
 
         elif len(password) <= 6:
-            return {"msg": "Password harus berisi minimal 6 digit!"}
+            return jsonify( {"message": "Password harus berisi minimal 6 digit!"} )
 
         else:
             # save data to the database
