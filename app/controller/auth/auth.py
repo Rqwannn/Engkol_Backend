@@ -82,7 +82,7 @@ class Register(Resource):
             # return json response
             return jsonify({
                 "data": {
-                    "values": values.user_id,
+                    "user_id": values.user_id,
                     "username": values.username,
                     "email": values.email
                 },
