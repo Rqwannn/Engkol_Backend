@@ -36,6 +36,7 @@ class Login(Resource):
             return jsonify( {
                 "token" : access_token,
                 "data": {
+                    "user_id": user.user_id,
                     "username": user.username,
                     "email": user.email
                 },
@@ -81,7 +82,9 @@ class Register(Resource):
             # return json response
             return jsonify({
                 "data": {
-                    "username": values.username
+                    "values": values.user_id,
+                    "username": values.username,
+                    "email": values.email
                 },
                 "message": "Registrasi Berhasil",
                 "status": 200
