@@ -61,10 +61,10 @@ class Register(Resource):
 
         # data validation
         if not username or not password:
-            return {"msg": "Username dan Password tidak boleh kosong!"}
+            return jsonify({"msg": "Username dan Password tidak boleh kosong!"})
 
         elif len(password) <= 6:
-            return {"msg": "Password harus berisi minimal 6 digit!"}
+            return jsonify({"msg": "Password harus berisi minimal 6 digit!"})
 
         else:
             # save data to the database
