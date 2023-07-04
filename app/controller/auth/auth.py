@@ -28,18 +28,11 @@ class Login(Resource):
 
         # Validasi data
         username = args['username']
-        email = args['email']
         password = args['password']
 
         if not username or not password:
             return {
                 "message": "Username dan password harus diisi",
-                "status": 400
-            }
-
-        elif not email:
-            return {
-                "message": "Email tidak boleh kosong",
                 "status": 400
             }
 
@@ -64,6 +57,7 @@ class Register(Resource):
         # fetch data
         username = request.form.get('username')
         password = request.form.get('password')
+        email = request.form.get('email')
 
         # data validation
         if not username or not password:
@@ -75,7 +69,7 @@ class Register(Resource):
         else:
             # save data to the database
             password_hash = generate_password_hash(password)
-            values = Users(username=username, password=password_hash)
+            values = Users(username=username, password=password_hash, email=email)
 
             # handler if username already use
             try:
