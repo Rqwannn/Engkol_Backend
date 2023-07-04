@@ -14,10 +14,10 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__)
 
-    app.config['SECRET_KEY'] = 'secret-key'
+    app.config['SECRET_KEY'] = 'jladbfkaUBDajdkbfkjdaIGd8f9adoHdfkja'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
     app.config['OPENAI_SECRET_KEY'] = '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'
-    app.config['JWT_SECRET_KEY'] = 'super-secret'
+    app.config['JWT_SECRET_KEY'] = 'laudgfudjfHFOHDofihoshOd98fydHDof9d'
     jwt = JWTManager(app)
     db.init_app(app)
 
