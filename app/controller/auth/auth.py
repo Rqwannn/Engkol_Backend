@@ -78,12 +78,13 @@ class Register(Resource):
             except IntegrityError:
                 db.session.rollback()
                 message = 'Username nya udah ada yang pake'
-                return message
+                return jsonify(message=message)
 
             # return json response
-            return {
+            return jsonify({
                 "data": {
                     "username": values.username
                 },
-                "msg": "Registrasi Berhasil"
-            }, 200
+                "message": "Registrasi Berhasil",
+                "status": 200
+            })
