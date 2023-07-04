@@ -31,43 +31,41 @@ class OpenAIApi(Resource):
     def post(self):
             user_id = get_jwt_identity()
 
-            parser = reqparse.RequestParser()
-            parser.add_argument('bussiness_type', type=str, required=True)
-            parser.add_argument('bussiness_location', type=str, required=True)
-            parser.add_argument('budgets', type=str, required=True)
-            args = parser.parse_args()
+            bussiness_type = request.json.get('bussiness_type', None)
+            bussiness_location = request.json.get('bussiness_location', None)
+            budgets = request.json.get('budgets', None)
 
             # connect to openAi
 
             app = current_app._get_current_object()
             openai.api_key = app.config['OPENAI_SECRET_KEY']
 
-            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": f"saya ingin membuka usaha bidang {args['bussiness_type']} di {args['bussiness_location']} dengan modal sebesar {args['budgets']}. berikan dua saran usaha yang cocok untuk saya, lokasi spesifik yang strategis, dan cara pemasarannya"}])
+            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": f"saya ingin membuka usaha bidang {bussiness_type} di {bussiness_location} dengan modal sebesar {budgets}. berikan dua saran usaha yang cocok untuk saya, lokasi spesifik yang strategis, dan cara pemasarannya"}])
             completed = completion.choices[0].message.content
 
             values = Bussiness_plan(
                 user_id=user_id,
-                bussiness_type=args['bussiness_type'],
-                bussiness_location=args['bussiness_location'],
-                budgets=args['budgets'],
+                bussiness_type=bussiness_type,
+                bussiness_location=bussiness_location,
+                budgets=budgets,
+                is_deleted=0,
                 ai_message=completed
             )
 
             db.session.add(values)
             db.session.commit()
 
-            return jsonify(completed + "/n Agar perusahaan anda bisa berlangsung lama, sangat perlu melakukan pencatatan keuangan. Mencatat keuangan perusahaan bukanlah hal yang rumit, mencatat pengeluaran dan pemasukan harian sudah cukup untuk memulai mencatat keuangan. /n Anda dapat menggunakan fitur Pencatatan Keuangan yang tersedia di App Engkol yang sedang kamu gunakan ini.")
+            return jsonify(message=completed + "/n Agar perusahaan anda bisa berlangsung lama, sangat perlu melakukan pencatatan keuangan. Mencatat keuangan perusahaan bukanlah hal yang rumit, mencatat pengeluaran dan pemasukan harian sudah cukup untuk memulai mencatat keuangan. /n Anda dapat menggunakan fitur Pencatatan Keuangan yang tersedia di App Engkol yang sedang kamu gunakan ini.")
 
 
     @jwt_required()
-    def delete(self):
+    def delete(self, planID):
         user_id=get_jwt_identity()
+        
+        plan = Bussiness_plan.query.filter_by(bussiness_plan_id=planID).first()
 
-        values=Business_plan(
-            is_deleted=1
-        )
+        plan.is_deleted=1
 
-        db.session.add(values)
         db.session.commit()
 
         return {'msg':'data dihapus'}
