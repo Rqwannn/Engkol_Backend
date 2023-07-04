@@ -1,14 +1,13 @@
 import uuid
 from datetime import datetime
 from flask_login import current_user, login_required
-from flask import Flask, session, jsonify
+from flask import Flask, session, jsonify, request
 from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from app import db
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 from app.models.User import Users, Owner_profile
-from app.controller.access.access import WhoAreYou
 
 class ProfileResource(Resource):
     
