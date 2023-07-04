@@ -35,55 +35,52 @@ class ProfileResource(Resource):
     @jwt_required()
     def post(self):
         user_id = get_jwt_identity()
-
-        parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=str, required=True)
-        parser.add_argument('last_name', type=str, required=True)
-        parser.add_argument('birth_date', type=str, required=True)
-        parser.add_argument('telephone_number', type=str, required=True)
-        # parser.add_argument('postal_code', type=str, required=True)
-        parser.add_argument('address', type=str, required=True)
-        args = parser.parse_args()
+        first_name = request.json.get('first_name', None)
+        last_name = request.json.get('last_name', None)
+        birth_date = request.json.get('birth_date', None)
+        telephone_number = request.json.get('telephone_number', None)
+        postal_code = request.json.get('postal_code', None)
+        address = request.json.get('address', None)
 
         profile = Owner_profile(
             user_id=user_id,
-            first_name=args['first_name'],
-            last_name=args['last_name'],
-            birth_date=datetime.strptime(args['birth_date'], '%d-%m-%Y').date(),
-            telephone_number=args['telephone_number'],
-            # postal_code=args['postal_code'],
-            address=args['address']
+            first_name=first_name,
+            last_name=last_name,
+            birth_date=birth_date,
+            telephone_number=telephone_number,
+            postal_code=postal_code,
+            address=address
         )
 
         db.session.add(profile)
         db.session.commit()
 
-        return {'message': 'Profile created successfully'}, 201
+        msg = "Profile telah berhasil dibuat!"
+        return jsonify(message=msg)
 
     @jwt_required()
     def put(self):
         user_id = get_jwt_identity()
-        
-        parser = reqparse.RequestParser()
-        parser.add_argument('first_name', type=str, required=True)
-        parser.add_argument('last_name', type=str, required=True)
-        parser.add_argument('birth_date', type=str, required=True)
-        parser.add_argument('telephone_number', type=str, required=True)
-        # parser.add_argument('postal_code', type=str, required=True)
-        parser.add_argument('address', type=str, required=True)
-        args = parser.parse_args()
+        first_name = request.json.get('first_name', None)
+        last_name = request.json.get('last_name', None)
+        birth_date = request.json.get('birth_date', None)
+        telephone_number = request.json.get('telephone_number', None)
+        postal_code = request.json.get('postal_code', None)
+        address = request.json.get('address', None)
 
         profile=Owner_profile.query.filter_by(user_id=user_id).first()
 
         if not profile:
-            return {'message': 'Profile not found'}, 404
+            msg_notProfile = 'Profile tidak ditemukan!'
+            return jsonify(message=msg)
         else:
-            profile.first_name = args['first_name']
-            profile.last_name = args['last_name']
-            profile.birth_date = datetime.strptime(args['birth_date'], '%d-%m-%Y').date()
-            profile.telephone_number = args['telephone_number']
-            # profile.postal_code = args['postal_code']
-            profile.address = args['address']
+            profile.first_name = first_name
+            profile.last_name = last_name
+            profile.birth_date = birth_date
+            profile.telephone_number = telephone_number
+            profile.postal_code = postal_code
+            profile.address = address
             db.session.commit()
 
-            return {'message': 'Profile updated successfully'}
+            msg = 'Profile telah berhasil diubah!'
+            return jsonify(message=msg)

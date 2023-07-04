@@ -13,7 +13,6 @@ class OpenAIApi(Resource):
     def get(self):
         user_id=get_jwt_identity()
 
-
         data = Bussiness_plan.query.filter_by(user_id=user_id).all()
 
         result = []
@@ -25,7 +24,7 @@ class OpenAIApi(Resource):
                 'message':plan.ai_message
             })
 
-        return {'business_plans': result}, 200
+        return jsonify(message=result)
 
 
     @jwt_required()
@@ -35,6 +34,7 @@ class OpenAIApi(Resource):
             bussiness_type = request.json.get('bussiness_type', None)
             bussiness_location = request.json.get('bussiness_location', None)
             budgets = request.json.get('budgets', None)
+            email = request.json.get('email', None)
 
             # connect to openAi
 
@@ -49,6 +49,7 @@ class OpenAIApi(Resource):
                 bussiness_type=bussiness_type,
                 bussiness_location=bussiness_location,
                 budgets=budgets,
+                email=email,
                 is_deleted=0,
                 ai_message=completed
             )
@@ -62,11 +63,9 @@ class OpenAIApi(Resource):
     @jwt_required()
     def delete(self, planID):
         user_id=get_jwt_identity()
-        
         plan = Bussiness_plan.query.filter_by(bussiness_plan_id=planID).first()
 
         plan.is_deleted=1
-
         db.session.commit()
 
         return {'msg':'data dihapus'}

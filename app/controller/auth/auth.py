@@ -59,8 +59,8 @@ class Register(Resource):
         email = request.json.get('email', None)
 
         # data validation
-        if not username or not password:
-            return jsonify( {"message": "Username dan Password tidak boleh kosong!"} )
+        if not username or not password or not email:
+            return jsonify( {"message": "Formulir tidak boleh kosong!"} )
 
         elif len(password) <= 6:
             return jsonify( {"message": "Password harus berisi minimal 6 digit!"} )
@@ -76,7 +76,7 @@ class Register(Resource):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
-                message = 'Username nya udah ada yang pake'
+                message = 'Username sudah digunakan atau tidak tersedia'
                 return jsonify(message=message)
             
             access_token = create_access_token(identity=values.user_id)
