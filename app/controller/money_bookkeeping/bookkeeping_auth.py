@@ -34,7 +34,7 @@ class RegisterBookkeeping(Resource):
                 username=username,
                 password=password_hash,
                 name_account=name_account,
-                role_id='owner' # ini akan diganti
+                role_id='owner' # ini akan diganti dari relasi role
             )
 
             try:
@@ -68,10 +68,9 @@ class Login_bookkeeping(Resource):
         nested_session = jwt_data['nested_session']
         data = nested_session.get('data')
 
-
         # print(user_id)
         return {
-            "bookkeepint_id":data,
+            "bookkeeping_id":data,
             "user_id":user_id
         }
 
