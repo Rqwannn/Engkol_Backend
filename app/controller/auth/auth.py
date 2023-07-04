@@ -16,7 +16,10 @@ class Login(Resource):
     
     def get(self):
         user_id = get_jwt_identity()
-        return {"user_id":user_id}, 200
+        return jsonify(
+            username=username,
+            email=email
+        )
 
     def post(self):
 
@@ -34,7 +37,7 @@ class Login(Resource):
         user = Users.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            secret_key = "jladbfkaUBDajdkbfkjdaIGd8f9adoHdfkja" 
+            secret_key = "laudgfudjfHFOHDofihoshOd98fydHDof9d" 
             payload = {
                 'username': 'contoh_user',
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
