@@ -22,11 +22,13 @@ class Login(Resource):
         # Parsing data dari POST
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str, required=True, help='Username is required')
+        parser.add_argument('email', type=str, required=True, help='email is required')
         parser.add_argument('password', type=str, required=True, help='Password is required')
         args = parser.parse_args()
 
         # Validasi data
         username = args['username']
+        email = args['email']
         password = args['password']
 
         if not username or not password:
