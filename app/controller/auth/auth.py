@@ -78,9 +78,12 @@ class Register(Resource):
                 db.session.rollback()
                 message = 'Username nya udah ada yang pake'
                 return jsonify(message=message)
+            
+            access_token = create_access_token(identity=values.user_id)
 
             # return json response
             return jsonify({
+                "token" : access_token,
                 "data": {
                     "user_id": values.user_id,
                     "username": values.username,
