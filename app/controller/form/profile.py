@@ -1,13 +1,14 @@
 import uuid
 from datetime import datetime
 from flask_login import current_user, login_required
-from flask import Flask, session
+from flask import Flask, session, jsonify
 from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from app import db
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 from app.models.User import Users, Owner_profile
+from app.controller.access.access import WhoAreYou
 
 class ProfileResource(Resource):
     
@@ -18,9 +19,18 @@ class ProfileResource(Resource):
         profile = Owner_profile.query.filter_by(user_id=user_id).first()
 
         if not profile:
-             return {"status":"0"}
+            return {"status":"0"}
         else:
-             return {"status":"1"}        
+            return jsonify({
+                "status":"1",
+                "data": {
+                    "first_name": profile.first_name,
+                    "last_name": profile.last_name,
+                    "birth_date": profile,
+                    "telephone_number": profile.telephone_number,
+                    "address": profile.address,
+                }
+            })
 
     @jwt_required()
     def post(self):

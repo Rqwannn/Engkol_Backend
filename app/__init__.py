@@ -43,5 +43,4 @@ def create_app():
         return Users.query.get(int(user_id))
 
     Migrate(app, db)
-
     return app
