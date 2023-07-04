@@ -33,8 +33,14 @@ class Login(Resource):
 
         if not username or not password:
             return {
-                "Pesan": "Username dan password harus diisi",
-                "Status": 400
+                "message": "Username dan password harus diisi",
+                "status": 400
+            }
+
+        elif not email:
+            return {
+                "message": "Email tidak boleh kosong",
+                "status": 400
             }
 
         # Proses autentikasi
