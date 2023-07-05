@@ -20,16 +20,17 @@ class ProfileResource(Resource):
         if not profile:
             return {"status":"0"}
         else:
-            return jsonify({
-                "status":"1",
-                "data": {
-                    "first_name": profile.first_name,
-                    "last_name": profile.last_name,
-                    "birth_date": profile,
-                    "telephone_number": profile.telephone_number,
-                    "address": profile.address,
-                }
-            })
+            response = [{
+                "first_name": profile.first_name,
+                "last_name": profile.last_name,
+                "birth_date": profile.birth_date.strftime("%d-%m-%Y"),
+                "telephone_number": profile.telephone_number,
+                "address": profile.address
+            }]
+            return jsonify(
+                status=1,
+                data=response
+            )
 
     @jwt_required()
     def post(self):
@@ -60,14 +61,15 @@ class ProfileResource(Resource):
     @jwt_required()
     def put(self):
         user_id = get_jwt_identity()
-        first_name = request.json.get('first_name', None)
-        last_name = request.json.get('last_name', None)
-        birth_date = request.json.get('birth_date', None)
-        telephone_number = request.json.get('telephone_number', None)
-        postal_code = request.json.get('postal_code', None)
-        address = request.json.get('address', None)
-
         profile=Owner_profile.query.filter_by(user_id=user_id).first()
+
+        user_id = get_jwt_identity()
+        first_name = request.json.get('first_name', profile.first_name)
+        last_name = request.json.get('last_name', profile.last_name)
+        birth_date = request.json.get('birth_date', profile.birth_date)
+        telephone_number = request.json.get('telephone_number', profile.telephone_number)
+        # postal_code = request.json.get('postal_code', profile.postal_code)
+        address = request.json.get('address', profile.address)
 
         if not profile:
             msg_notProfile = 'Profile tidak ditemukan!'
@@ -77,7 +79,7 @@ class ProfileResource(Resource):
             profile.last_name = last_name
             profile.birth_date = birth_date
             profile.telephone_number = telephone_number
-            profile.postal_code = postal_code
+            # profile.postal_code = postal_code
             profile.address = address
             db.session.commit()
 

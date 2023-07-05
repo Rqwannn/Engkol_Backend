@@ -16,9 +16,10 @@ class Login(Resource):
     @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
+        value = Users.query.filter_by(user_id=user_id).first()
         return jsonify(
-            username=username,
-            email=email
+            username=value.username,
+            email=value.email
         )
 
     def post(self):
