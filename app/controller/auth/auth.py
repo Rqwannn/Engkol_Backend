@@ -2,9 +2,11 @@ from flask import request, abort, jsonify, session
 from flask_restful import Resource, reqparse, fields, marshal_with
 from flask.config import Config
 from app import db
+import datetime
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+import jwt
 
 from app.models.User import Users
 
@@ -32,9 +34,15 @@ class Login(Resource):
         user = Users.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            access_token = create_access_token(identity=user.user_id)
+            secret_key = "jladbfkaUBDajdkbfkjdaIGd8f9adoHdfkja" 
+            payload = {
+                'username': 'contoh_user',
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+            }
+            token = jwt.encode(payload, secret_key, algorithm='HS256')
+            
             return jsonify( {
-                "token" : access_token,
+                "token" : token,
                 "data": {
                     "user_id": user.user_id,
                     "username": user.username,
@@ -59,8 +67,8 @@ class Register(Resource):
         email = request.json.get('email', None)
 
         # data validation
-        if not username or not password:
-            return jsonify( {"message": "Username dan Password tidak boleh kosong!"} )
+        if not username or not password or not email:
+            return jsonify( {"message": "Formulir tidak boleh kosong!"} )
 
         elif len(password) <= 6:
             return jsonify( {"message": "Password harus berisi minimal 6 digit!"} )
@@ -76,14 +84,11 @@ class Register(Resource):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
-                message = 'Username nya udah ada yang pake'
+                message = 'Username sudah digunakan atau tidak tersedia'
                 return jsonify(message=message)
-            
-            access_token = create_access_token(identity=values.user_id)
 
             # return json response
             return jsonify({
-                "token" : access_token,
                 "data": {
                     "user_id": values.user_id,
                     "username": values.username,
