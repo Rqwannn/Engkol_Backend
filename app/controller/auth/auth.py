@@ -6,7 +6,6 @@ import datetime
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
-import jwt
 
 from app.models.User import Users
 
@@ -14,6 +13,7 @@ from app.models.User import Users
 
 class Login(Resource):
     
+    @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
         return jsonify(
@@ -37,12 +37,7 @@ class Login(Resource):
         user = Users.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            secret_key = "laudgfudjfHFOHDofihoshOd98fydHDof9d" 
-            payload = {
-                'username': 'contoh_user',
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
-            }
-            token = jwt.encode(payload, secret_key, algorithm='HS256')
+            token = create_access_token(identity=user.user_id, expires_delta=datetime.timedelta(days=1))
             
             return jsonify( {
                 "token" : token,
