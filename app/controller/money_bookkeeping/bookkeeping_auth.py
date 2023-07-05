@@ -80,14 +80,8 @@ class Login_bookkeeping(Resource):
 
         user_id = get_jwt_identity()
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('username', type=str, required=True, help='Username is required')
-        parser.add_argument('password', type=str, required=True, help='Password is required')
-        args = parser.parse_args()
-
-        # Validasi data
-        username = args['username']
-        password = args['password']
+        username = request.json.get('username', None)
+        password = request.json.get('password', None)
 
         if not username or not password:
             return {
@@ -101,12 +95,12 @@ class Login_bookkeeping(Resource):
         if bk_account and check_password_hash(bk_account.password, password):
 
             additional_claims = {'nested_session': {'data': bk_account.bookkeeping_account_id}}
-            access_token = create_access_token(identity=user_id, additional_claims=additional_claims)
-            return {"access_token":access_token}
+            access_token = create_access_token(identity=user_id, additional_claims=additional_claims, expires_delta=datetime.timedelta(days=1))
+            return jsonify(
+                token=access_token,
+                username=username
+            )
 
         else:
             # Jika autentikasi gagal
-            return {
-                "Pesan": "Username atau password salah",
-                "Status": 401
-            }
+            return jsonify(message='Username atau password salah')
