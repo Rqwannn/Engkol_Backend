@@ -11,20 +11,22 @@ class OpenAIApi(Resource):
 
     @jwt_required()
     def get(self):
-        user_id=get_jwt_identity()
+        user_id = get_jwt_identity()
+        print(user_id)
 
         data = Bussiness_plan.query.filter_by(user_id=user_id).all()
-
+        print('test')
         result = []
         for plan in data:
-            result.append({
-                'bussiness_plan_id':plan.bussiness_plan_id,
-                'bussiness_type':plan.bussiness_type,
-                'bussiness_email':plan.bussiness_email,
-                'location': plan.bussiness_location,
-                'budget':plan.budgets,
-                'created_at':plan.created_at
-            })
+            if plan.is_deleted == 0:
+                result.append({
+                    'bussiness_plan_id':plan.bussiness_plan_id,
+                    'bussiness_type':plan.bussiness_type,
+                    'bussiness_email':plan.bussiness_email,
+                    'location': plan.bussiness_location,
+                    'budget':plan.budgets,
+                    'created_at':plan.created_at
+                })
 
         return jsonify( {
              'data': result,
@@ -41,8 +43,7 @@ class OpenAIApi(Resource):
             budgets = request.json.get('budgets', None)
             email = request.json.get('email', None)
 
-            # connect to openAi
-
+            # connect to openAis
             app = current_app._get_current_object()
             openai.api_key = app.config['OPENAI_SECRET_KEY']
 
@@ -54,7 +55,7 @@ class OpenAIApi(Resource):
                 bussiness_type=bussiness_type,
                 bussiness_location=bussiness_location,
                 budgets=budgets,
-                email=email,
+                bussiness_email=email,
                 is_deleted=0,
                 ai_message=completed
             )
@@ -62,7 +63,13 @@ class OpenAIApi(Resource):
             db.session.add(values)
             db.session.commit()
 
-            return jsonify(message=completed + "/n Agar perusahaan anda bisa berlangsung lama, sangat perlu melakukan pencatatan keuangan. Mencatat keuangan perusahaan bukanlah hal yang rumit, mencatat pengeluaran dan pemasukan harian sudah cukup untuk memulai mencatat keuangan. /n Anda dapat menggunakan fitur Pencatatan Keuangan yang tersedia di App Engkol yang sedang kamu gunakan ini.")
+            return jsonify(
+                message=completed + "/n Agar perusahaan anda bisa berlangsung lama, sangat perlu melakukan pencatatan keuangan. Mencatat keuangan perusahaan bukanlah hal yang rumit, mencatat pengeluaran dan pemasukan harian sudah cukup untuk memulai mencatat keuangan. /n Anda dapat menggunakan fitur Pencatatan Keuangan yang tersedia di App Engkol yang sedang kamu gunakan ini.",
+                bussiness_type=bussiness_type,
+                bussiness_location=bussiness_location,
+                budgets=budgets,
+                bussiness_email=email,
+            )
 
 
     @jwt_required()

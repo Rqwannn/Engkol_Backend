@@ -240,7 +240,7 @@ class Pivot_postal_code_location(db.Model, Base):
 
 ##### BUSSINESS PLAN #####
 
-class Bussiness_plan(db.Model, Base):
+class Bussiness_plan(db.Model):
     __tablename__ = 'bussiness_plan'
 
     bussiness_plan_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
@@ -257,22 +257,22 @@ class Bussiness_plan(db.Model, Base):
     is_deleted = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    pivot_bussiness_bookkeeping = relationship("Pivot_bussiness_bookkeeping", backref='bussiness_plan', lazy=True)
+    # pivot_bussiness_bookkeeping = relationship("pivot_bussiness_bookkeeping", backref='bussiness_plan', lazy=True)
 
     def get_id(self):
         return str(self.bussiness_plan_id)
 
 
-class Pivot_bussiness_bookkeeping(db.Model, Base):
-    __tablename__ = 'pivot_bussiness_bookkeeping'
+# class Pivot_bussiness_bookkeeping(db.Model, Base):
+#     __tablename__ = 'pivot_bussiness_bookkeeping'
 
-    pivot_bussiness_bookkeeping_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
-    bookkeeping_account_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     pivot_bussiness_bookkeeping_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+#     bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
+#     bookkeeping_account_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'))
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    def get_id(self):
-        return str(self.pivot_bussiness_bookkeeping)
+#     def get_id(self):
+#         return str(self.pivot_bussiness_bookkeeping)
 
 
 class Pivot_bussiness_plan_location(db.Model, Base):
