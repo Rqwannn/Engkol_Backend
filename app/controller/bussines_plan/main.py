@@ -13,19 +13,24 @@ class OpenAIApi(Resource):
     def get(self):
         user_id=get_jwt_identity()
 
-
+        print(user_id)
         data = Bussiness_plan.query.filter_by(user_id=user_id).all()
 
         result = []
         for plan in data:
             result.append({
+                'bussiness_plan_id':plan.bussiness_plan_id,
                 'bussiness_type':plan.bussiness_type,
+                'bussiness_email':plan.bussiness_email,
                 'location': plan.bussiness_location,
                 'budget':plan.budgets,
-                'message':plan.ai_message
+                'created_at':plan.created_at
             })
 
-        return {'business_plans': result}, 200
+        return jsonify( {
+             'data': result,
+             'status': 200
+        }) 
 
 
     @jwt_required()
