@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from flask_login import current_user, login_required
-from flask import request, Flask, session
+from flask import request, Flask, session, jsonify
 from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from app import db
@@ -45,7 +45,6 @@ class RegisterBookkeeping(Resource):
                 message = 'Username sudah digunakan atau tidak tersedia'
                 return jsonify(message=message)
 
-                values
 
                 return jsonify({
                 "data": {
@@ -101,6 +100,30 @@ class Login_bookkeeping(Resource):
                 username=username
             )
 
-        else:
-            # Jika autentikasi gagal
-            return jsonify(message='Username atau password salah')
+        # Jika autentikasi gagal
+        return jsonify(message='Username atau password salah')
+
+# class BookkeepingAccountRegister(Resource):
+#     @jwt_required()
+#     def post(self):
+#         user_id = get_jwt_identity()
+#         jwt_data = get_jwt()
+#         nested_session = jwt_data['nested_session']
+#         bk_id = nested_session.get('data')
+        
+#         username = request.json.get('username', None)
+#         password = request.json.get('password', None)
+#         user = Users.query.get(username=username)
+
+#         if not user:
+#             return jsonify(message="Username tidak ditemukan!")
+#         if not password:
+#             return jsonify(message="Password harus diisi!")
+#         elif len(password) <= 6:
+#             return jsonify(message="Password harus memiliki setidaknya 6 digit!")
+        
+#         password_hash = check_password_hash(password)
+
+#         value = Users(
+            
+#         )

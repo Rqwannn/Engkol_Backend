@@ -14,19 +14,17 @@ class OpenAIApi(Resource):
         user_id = get_jwt_identity()
         print(user_id)
 
-        data = Bussiness_plan.query.filter_by(user_id=user_id).all()
-        print('test')
+        data = Bussiness_plan.query.filter_by(user_id=user_id, is_deleted=0).all()
         result = []
         for plan in data:
-            if plan.is_deleted == 0:
-                result.append({
-                    'bussiness_plan_id':plan.bussiness_plan_id,
-                    'bussiness_type':plan.bussiness_type,
-                    'bussiness_email':plan.bussiness_email,
-                    'location': plan.bussiness_location,
-                    'budget':plan.budgets,
-                    'created_at':plan.created_at
-                })
+            result.append({
+                'bussiness_plan_id':plan.bussiness_plan_id,
+                'bussiness_type':plan.bussiness_type,
+                'bussiness_email':plan.bussiness_email,
+                'location': plan.bussiness_location,
+                'budget':plan.budgets,
+                'created_at':plan.created_at
+            })
 
         return jsonify( {
              'data': result,
@@ -71,13 +69,11 @@ class OpenAIApi(Resource):
                 bussiness_email=email,
             )
 
-
-    @jwt_required()
     def delete(self, planID):
-        user_id=get_jwt_identity()
+
         plan = Bussiness_plan.query.filter_by(bussiness_plan_id=planID).first()
 
         plan.is_deleted=1
         db.session.commit()
 
-        return {'msg':'data dihapus'}
+        return jsonify(message="Data berhasil dihapus")
