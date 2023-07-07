@@ -1,13 +1,9 @@
-import uuid
-from datetime import datetime
-from flask_login import current_user, login_required
-from flask import Flask, session, jsonify, request
-from flask_restful import Api, Resource, reqparse
-from flask_sqlalchemy import SQLAlchemy
+from flask import jsonify, request
+from flask_restful import Resource
 from app import db
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
-from app.models.User import Users, Owner_profile
+from app.models.User import Owner_profile
 
 class ProfileResource(Resource):
     
@@ -68,20 +64,28 @@ class ProfileResource(Resource):
         last_name = request.json.get('last_name', profile.last_name)
         birth_date = request.json.get('birth_date', profile.birth_date)
         telephone_number = request.json.get('telephone_number', profile.telephone_number)
-        # postal_code = request.json.get('postal_code', profile.postal_code)
+        postal_code = request.json.get('postal_code', profile.postal_code)
         address = request.json.get('address', profile.address)
 
         if not profile:
             msg_notProfile = 'Profile tidak ditemukan!'
-            return jsonify(message=msg)
+            return jsonify(message=msg_notProfile)
         else:
             profile.first_name = first_name
             profile.last_name = last_name
             profile.birth_date = birth_date
             profile.telephone_number = telephone_number
-            # profile.postal_code = postal_code
+            profile.postal_code = postal_code
             profile.address = address
             db.session.commit()
 
             msg = 'Profile telah berhasil diubah!'
-            return jsonify(message=msg)
+            
+            return jsonify(message=msg, data = {
+                "first_name":first_name,
+                "last_name":last_name,
+                "birth_date":birth_date,
+                "telephone_number":telephone_number,
+                "postal_code":postal_code,
+                "address":address
+            })

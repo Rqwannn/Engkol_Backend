@@ -1,8 +1,7 @@
-from flask import request, abort, jsonify, current_app
-from flask_restful import Resource, reqparse, fields, marshal_with
-from flask.config import Config
+from flask import request, jsonify, current_app
+from flask_restful import Resource
 from app import db
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+from flask_jwt_extended import get_jwt_identity, jwt_required
 import openai
 
 from app.models.User import Bussiness_plan
@@ -18,15 +17,16 @@ class OpenAIApi(Resource):
         result = []
         for plan in data:
             result.append({
-                'bussiness_plan_id':plan.bussiness_plan_id,
-                'bussiness_type':plan.bussiness_type,
-                'bussiness_email':plan.bussiness_email,
+                'bussiness_plan_id': plan.bussiness_plan_id,
+                'bussiness_type': plan.bussiness_type,
+                'bussiness_email': plan.bussiness_email,
+                'target_market':plan.target_market,
                 'location': plan.bussiness_location,
-                'budget':plan.budgets,
-                'created_at':plan.created_at
+                'budget': plan.budgets,
+                'created_at': plan.created_at
             })
 
-        return jsonify( {
+        return jsonify({
              'data': result,
              'status': 200
         }) 
@@ -40,6 +40,8 @@ class OpenAIApi(Resource):
             bussiness_location = request.json.get('bussiness_location', None)
             budgets = request.json.get('budgets', None)
             email = request.json.get('email', None)
+            target_market = request.json.get('target_market', None)
+
 
             # connect to openAis
             app = current_app._get_current_object()
@@ -54,7 +56,9 @@ class OpenAIApi(Resource):
                 bussiness_location=bussiness_location,
                 budgets=budgets,
                 bussiness_email=email,
+                target_market=target_market,
                 is_deleted=0,
+                status=0,
                 ai_message=completed
             )
 
@@ -62,9 +66,10 @@ class OpenAIApi(Resource):
             db.session.commit()
 
             return jsonify(
-                message=completed + "/n Agar perusahaan anda bisa berlangsung lama, sangat perlu melakukan pencatatan keuangan. Mencatat keuangan perusahaan bukanlah hal yang rumit, mencatat pengeluaran dan pemasukan harian sudah cukup untuk memulai mencatat keuangan. /n Anda dapat menggunakan fitur Pencatatan Keuangan yang tersedia di App Engkol yang sedang kamu gunakan ini.",
+                message=completed + "/n Agar perusahaan anda bisa bertahan lama, sangat perlu melakukan pencatatan keuangan. Mencatat keuangan perusahaan bukanlah hal yang rumit, mencatat pengeluaran dan pemasukan harian sudah cukup untuk memulai mencatat keuangan. /n Anda dapat menggunakan fitur Pencatatan Keuangan yang tersedia di App Engkol yang sedang kamu gunakan ini.",
                 bussiness_type=bussiness_type,
                 bussiness_location=bussiness_location,
+                target_market=target_market,
                 budgets=budgets,
                 bussiness_email=email,
             )

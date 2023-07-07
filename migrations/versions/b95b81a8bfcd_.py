@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 8d4c3e5e1408
+Revision ID: b95b81a8bfcd
 Revises: 
-Create Date: 2023-07-05 23:00:25.535546
+Create Date: 2023-07-07 14:08:28.360499
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8d4c3e5e1408'
+revision = 'b95b81a8bfcd'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,17 +29,6 @@ def upgrade():
     sa.Column('role_status', sa.String(length=2), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('role_id')
-    )
-    op.create_table('postal_code_address',
-    sa.Column('postal_code', sa.String(length=36), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('postal_code')
-    )
-    op.create_table('provinces_list',
-    sa.Column('province_id', sa.String(length=36), nullable=False),
-    sa.Column('province_name', sa.String(length=30), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('province_id')
     )
     op.create_table('transaction_type',
     sa.Column('transaction_type_id', sa.String(length=36), nullable=False),
@@ -61,27 +50,27 @@ def upgrade():
     op.create_table('bookkeeping_account',
     sa.Column('bookkeeping_account_id', sa.String(length=36), nullable=False),
     sa.Column('user_id', sa.String(length=36), nullable=True),
+    sa.Column('bookkeeping_ticket_id', sa.String(length=36), nullable=True),
     sa.Column('role_id', sa.String(length=50), nullable=True),
-    sa.Column('activity', sa.String(length=255), nullable=True),
-    sa.Column('username', sa.String(length=50), nullable=False),
-    sa.Column('password', sa.String(length=50), nullable=False),
     sa.Column('name_account', sa.String(length=50), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('deleted_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['bookkeeping_ticket_id'], ['bookkeeping_ticket.bookkeeping_ticket_id'], ),
     sa.ForeignKeyConstraint(['role_id'], ['money_bookkeeping_role.role_id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('bookkeeping_account_id'),
-    sa.UniqueConstraint('username')
+    sa.PrimaryKeyConstraint('bookkeeping_account_id')
     )
     op.create_table('bussiness_plan',
     sa.Column('bussiness_plan_id', sa.String(length=36), nullable=False),
     sa.Column('user_id', sa.String(length=36), nullable=True),
     sa.Column('bussiness_email', sa.String(length=100), nullable=True),
-    sa.Column('bussiness_type', sa.String(length=50), nullable=True),
-    sa.Column('bussiness_location', sa.String(length=100), nullable=True),
-    sa.Column('budgets', sa.String(length=100), nullable=True),
+    sa.Column('bussiness_type', sa.String(length=72), nullable=True),
+    sa.Column('postal_code', sa.String(length=36), nullable=True),
+    sa.Column('bussiness_location', sa.String(length=120), nullable=True),
+    sa.Column('budgets', sa.String(length=120), nullable=True),
     sa.Column('ai_message', sa.Text(), nullable=True),
-    sa.Column('status', sa.String(length=50), nullable=True),
+    sa.Column('target_market', sa.String(length=120), nullable=True),
+    sa.Column('status', sa.String(length=72), nullable=True),
     sa.Column('is_deleted', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
@@ -103,31 +92,15 @@ def upgrade():
     op.create_table('owner_profile',
     sa.Column('profile_id', sa.String(length=36), nullable=False),
     sa.Column('user_id', sa.String(length=36), nullable=False),
+    sa.Column('postal_code', sa.String(length=36), nullable=True),
     sa.Column('first_name', sa.String(length=30), nullable=True),
     sa.Column('last_name', sa.String(length=30), nullable=True),
     sa.Column('birth_date', sa.Date(), nullable=True),
-    sa.Column('telephone_number', sa.String(length=15), nullable=True),
+    sa.Column('telephone_number', sa.String(length=16), nullable=True),
     sa.Column('address', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('profile_id')
-    )
-    op.create_table('regencys_list',
-    sa.Column('regency_id', sa.String(length=36), nullable=False),
-    sa.Column('regencys_name', sa.String(length=30), nullable=True),
-    sa.Column('provincy_id', sa.String(length=36), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['provincy_id'], ['provinces_list.province_id'], ),
-    sa.PrimaryKeyConstraint('regency_id')
-    )
-    op.create_table('users_history',
-    sa.Column('user_history_id', sa.String(length=36), nullable=False),
-    sa.Column('user_id', sa.String(length=36), nullable=False),
-    sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('history_date', sa.DateTime(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('user_history_id')
     )
     op.create_table('activity_role',
     sa.Column('activity_id', sa.String(length=36), nullable=False),
@@ -149,76 +122,19 @@ def upgrade():
     sa.ForeignKeyConstraint(['money_bookkeeping_id'], ['money_bookkeeping.money_bookkeeping_id'], ),
     sa.PrimaryKeyConstraint('aset_id')
     )
-    op.create_table('pivot_bussiness_bookkeeping',
-    sa.Column('pivot_bussiness_bookkeeping_id', sa.String(length=36), nullable=False),
-    sa.Column('bussiness_plan_id', sa.String(length=36), nullable=True),
-    sa.Column('bookkeeping_account_id', sa.String(length=36), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['bookkeeping_account_id'], ['bookkeeping_account.bookkeeping_account_id'], ),
-    sa.ForeignKeyConstraint(['bussiness_plan_id'], ['bussiness_plan.bussiness_plan_id'], ),
-    sa.PrimaryKeyConstraint('pivot_bussiness_bookkeeping_id')
-    )
-    op.create_table('pivot_bussiness_plan_account',
-    sa.Column('pivot_bussiness_plan_account_id', sa.String(length=36), nullable=False),
-    sa.Column('bussiness_plan_id', sa.String(length=36), nullable=True),
-    sa.Column('user_id', sa.String(length=36), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['bussiness_plan_id'], ['bussiness_plan.bussiness_plan_id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('pivot_bussiness_plan_account_id')
-    )
-    op.create_table('subdistricts_list',
-    sa.Column('subdistrict_id', sa.String(length=36), nullable=False),
-    sa.Column('regency_id', sa.String(length=36), nullable=False),
-    sa.Column('subdistrict_name', sa.String(length=30), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['regency_id'], ['regencys_list.regency_id'], ),
-    sa.PrimaryKeyConstraint('subdistrict_id')
-    )
-    op.create_table('pivot_postal_code_location',
-    sa.Column('pivot_postal_code_location', sa.String(length=36), nullable=False),
-    sa.Column('postal_code', sa.String(length=36), nullable=True),
-    sa.Column('provinces_id', sa.String(length=36), nullable=False),
-    sa.Column('regency_id', sa.String(length=36), nullable=False),
-    sa.Column('subdistricts_id', sa.String(length=36), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['postal_code'], ['postal_code_address.postal_code'], ),
-    sa.ForeignKeyConstraint(['provinces_id'], ['provinces_list.province_id'], ),
-    sa.ForeignKeyConstraint(['regency_id'], ['regencys_list.regency_id'], ),
-    sa.ForeignKeyConstraint(['subdistricts_id'], ['subdistricts_list.subdistrict_id'], ),
-    sa.PrimaryKeyConstraint('pivot_postal_code_location')
-    )
-    op.create_table('pivot_bussiness_plan_location',
-    sa.Column('pivot_bussiness_plan_location_id', sa.String(length=36), nullable=False),
-    sa.Column('bussiness_plan_id', sa.String(length=36), nullable=True),
-    sa.Column('pivot_postal_code_location_id', sa.String(length=36), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['bussiness_plan_id'], ['bussiness_plan.bussiness_plan_id'], ),
-    sa.ForeignKeyConstraint(['pivot_postal_code_location_id'], ['pivot_postal_code_location.pivot_postal_code_location'], ),
-    sa.PrimaryKeyConstraint('pivot_bussiness_plan_location_id')
-    )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('pivot_bussiness_plan_location')
-    op.drop_table('pivot_postal_code_location')
-    op.drop_table('subdistricts_list')
-    op.drop_table('pivot_bussiness_plan_account')
-    op.drop_table('pivot_bussiness_bookkeeping')
     op.drop_table('bookkeeping_asets')
     op.drop_table('activity_role')
-    op.drop_table('users_history')
-    op.drop_table('regencys_list')
     op.drop_table('owner_profile')
     op.drop_table('money_bookkeeping')
     op.drop_table('bussiness_plan')
     op.drop_table('bookkeeping_account')
     op.drop_table('users')
     op.drop_table('transaction_type')
-    op.drop_table('provinces_list')
-    op.drop_table('postal_code_address')
     op.drop_table('money_bookkeeping_role')
     op.drop_table('bookkeeping_ticket')
     # ### end Alembic commands ###

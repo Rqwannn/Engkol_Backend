@@ -20,42 +20,27 @@ class Users(db.Model, UserMixin, Base):
 
     bookkeeping_account = relationship("Bookkeeping_account", backref='users', lazy=True)
     owner_profile = relationship("Owner_profile", backref='users', lazy=True)
-    user_history = relationship("Users_history", backref='users', lazy=True)
     bussiness_plan = relationship("Bussiness_plan", backref="users", lazy=True)
-
 
     def get_id(self):
         return str(self.user_id)
 
 
-class Owner_profile(db.Model, Base):
+class Owner_profile(db.Model):
     __tablename__ = 'owner_profile'
 
     profile_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
-    # postal_code = db.Column(db.String(36), db.ForeignKey('postal_code_address.postal_code'), nullable=False)
+    postal_code = db.Column(db.String(36))
     first_name = db.Column(db.String(30))
     last_name = db.Column(db.String(30))
     birth_date = db.Column(db.Date)
-    telephone_number = db.Column(db.String(15))
+    telephone_number = db.Column(db.String(16))
     address = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
     def get_id(self):
         return str(self.profile_id)
-
-
-class Users_history(db.Model, Base):
-    __tablename__ = 'users_history'
-
-    user_history_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=False)
-    description = db.Column(db.Text)
-    history_date = db.Column(db.DateTime, default=datetime.utcnow())
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
-
-    def get_id(self):
-        return str(self.user_history_id)
 
 
 ##### MONEY BOOKKEEPING #####
@@ -65,11 +50,8 @@ class Bookkeeping_account(db.Model, Base):
 
     bookkeeping_account_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
-    # bookkeeping_ticket_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_ticket.bookkeeping_ticket_id'))
+    bookkeeping_ticket_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_ticket.bookkeeping_ticket_id'))
     role_id = db.Column(db.String(50), db.ForeignKey('money_bookkeeping_role.role_id'))
-    activity = db.Column(db.String(255))
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(50), nullable=False)
     name_account = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
     deleted_at = db.Column(db.DateTime)
@@ -144,7 +126,7 @@ class Bookkeeping_ticket(db.Model, Base):
     bookkeeping_ticket_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    # bookkeeping_account = relationship("Bookkeeping_account", backref='tickets', lazy=True)
+    bookkeeping_account = relationship("Bookkeeping_account", backref='tickets', lazy=True)
     money_bookkeeping = relationship("Money_bookkeeping", backref='ticket', lazy=True)
 
     def get_id(self):
@@ -169,73 +151,73 @@ class Bookkeeping_asets(db.Model, Base):
 
 # ##### POSTAL CODE #####
 
-class Postal_code_address(db.Model, Base):
-    __tablename__ = 'postal_code_address'
+# class Postal_code_address(db.Model, Base):
+#     __tablename__ = 'postal_code_address'
 
-    postal_code = db.Column(db.String(36), primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     postal_code = db.Column(db.String(36), primary_key=True)
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    # owner_profile = relationship("Owner_profile", backref="postal_code_address", lazy=True)
+#     # owner_profile = relationship("Owner_profile", backref="postal_code_address", lazy=True)
 
-    def get_id(self):
-        return str(self.postal_code)
-
-
-class Provinces_list(db.Model, Base):
-    __tablename__ = 'provinces_list'
-
-    province_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    province_name = db.Column(db.String(30))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
-
-    regencys_list = relationship("Regencys_list", backref="provinces_list", lazy=True)
-    pivot_postal_code_location = relationship("Pivot_postal_code_location", backref="provinces_list", lazy=True)
-
-    def get_id(self):
-        return str(self.province_id)
+#     def get_id(self):
+#         return str(self.postal_code)
 
 
-class Regencys_list(db.Model, Base):
-    __tablename__ = 'regencys_list'
+# class Provinces_list(db.Model, Base):
+#     __tablename__ = 'provinces_list'
 
-    regency_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    regencys_name = db.Column(db.String(30))
-    provincy_id = db.Column(db.String(36), db.ForeignKey('provinces_list.province_id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     province_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+#     province_name = db.Column(db.String(30))
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    subdistricts_list = relationship("Subdistricts_list", backref="regencys_list", lazy=True)
-    pivot_postal_code_location = relationship("Pivot_postal_code_location", backref="regencys_list", lazy=True)
+#     regencys_list = relationship("Regencys_list", backref="provinces_list", lazy=True)
+#     pivot_postal_code_location = relationship("Pivot_postal_code_location", backref="provinces_list", lazy=True)
 
-    def get_id(self):
-        return str(self.regency_id)
-
-
-class Subdistricts_list(db.Model, Base):
-    __tablename__ = 'subdistricts_list'
-
-    subdistrict_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    regency_id = db.Column(db.String(36), db.ForeignKey('regencys_list.regency_id'), nullable=False)
-    subdistrict_name = db.Column(db.String(30))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
-
-    pivot_postal_code_location = relationship("Pivot_postal_code_location", backref="subdistricts_list", lazy=True)
-
-    def get_id(self):
-        return str(self.subdistrict_id)
+#     def get_id(self):
+#         return str(self.province_id)
 
 
-class Pivot_postal_code_location(db.Model, Base):
-    __tablename__ = 'pivot_postal_code_location'
+# class Regencys_list(db.Model, Base):
+#     __tablename__ = 'regencys_list'
 
-    pivot_postal_code_location = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    postal_code = db.Column(db.String(36), db.ForeignKey('postal_code_address.postal_code'))
-    provinces_id = db.Column(db.String(36), db.ForeignKey('provinces_list.province_id'), nullable=False)
-    regency_id = db.Column(db.String(36), db.ForeignKey('regencys_list.regency_id'), nullable=False)
-    subdistricts_id = db.Column(db.String(36), db.ForeignKey('subdistricts_list.subdistrict_id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     regency_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+#     regencys_name = db.Column(db.String(30))
+#     provincy_id = db.Column(db.String(36), db.ForeignKey('provinces_list.province_id'), nullable=False)
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    def get_id(self):
-        return str(self.postel_code_location)
+#     subdistricts_list = relationship("Subdistricts_list", backref="regencys_list", lazy=True)
+#     pivot_postal_code_location = relationship("Pivot_postal_code_location", backref="regencys_list", lazy=True)
+
+#     def get_id(self):
+#         return str(self.regency_id)
+
+
+# class Subdistricts_list(db.Model, Base):
+#     __tablename__ = 'subdistricts_list'
+
+#     subdistrict_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+#     regency_id = db.Column(db.String(36), db.ForeignKey('regencys_list.regency_id'), nullable=False)
+#     subdistrict_name = db.Column(db.String(30))
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+
+#     pivot_postal_code_location = relationship("Pivot_postal_code_location", backref="subdistricts_list", lazy=True)
+
+#     def get_id(self):
+#         return str(self.subdistrict_id)
+
+
+# class Pivot_postal_code_location(db.Model, Base):
+#     __tablename__ = 'pivot_postal_code_location'
+
+#     pivot_postal_code_location = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+#     postal_code = db.Column(db.String(36), db.ForeignKey('postal_code_address.postal_code'))
+#     provinces_id = db.Column(db.String(36), db.ForeignKey('provinces_list.province_id'), nullable=False)
+#     regency_id = db.Column(db.String(36), db.ForeignKey('regencys_list.regency_id'), nullable=False)
+#     subdistricts_id = db.Column(db.String(36), db.ForeignKey('subdistricts_list.subdistrict_id'), nullable=False)
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+
+#     def get_id(self):
+#         return str(self.postel_code_location)
 
 
 ##### BUSSINESS PLAN #####
@@ -246,14 +228,13 @@ class Bussiness_plan(db.Model):
     bussiness_plan_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
     bussiness_email = db.Column(db.String(100))
-    bussiness_type = db.Column(db.String(50))
-    # postal_code = db.Column(db.String(36))
-    bussiness_location = db.Column(db.String(100))
-    # geolocation = db.Column(db.String(40))
-    budgets = db.Column(db.String(100))
+    bussiness_type = db.Column(db.String(72))
+    postal_code = db.Column(db.String(36))
+    bussiness_location = db.Column(db.String(120))
+    budgets = db.Column(db.String(120))
     ai_message = db.Column(db.Text)
-    # target_market = db.Column(db.String(100))
-    status = db.Column(db.String(50))
+    target_market = db.Column(db.String(120))
+    status = db.Column(db.String(72))
     is_deleted = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
@@ -275,26 +256,25 @@ class Bussiness_plan(db.Model):
 #         return str(self.pivot_bussiness_bookkeeping)
 
 
-class Pivot_bussiness_plan_location(db.Model, Base):
-    __tablename__ = 'pivot_bussiness_plan_location'
+# class Pivot_bussiness_plan_location(db.Model, Base):
+#     __tablename__ = 'pivot_bussiness_plan_location'
 
-    pivot_bussiness_plan_location_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
-    pivot_postal_code_location_id = db.Column(db.String(36),
-                                              db.ForeignKey('pivot_postal_code_location.pivot_postal_code_location'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     pivot_bussiness_plan_location_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+#     bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
+#     pivot_postal_code_location_id = db.Column(db.String(36),db.ForeignKey('pivot_postal_code_location.pivot_postal_code_location'))
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    def get_id(self):
-        return str(self.pivot_bussiness_plan_location_id)
+#     def get_id(self):
+#         return str(self.pivot_bussiness_plan_location_id)
 
 
-class Pivot_bussiness_plan_account(db.Model, Base):
-    __tablename__ = 'pivot_bussiness_plan_account'
+# class Pivot_bussiness_plan_account(db.Model, Base):
+#     __tablename__ = 'pivot_bussiness_plan_account'
 
-    pivot_bussiness_plan_account_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
-    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     pivot_bussiness_plan_account_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+#     bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
+#     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
+#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    def get_id(self):
-        return str(self.pivot_bussiness_plan_account_id)
+#     def get_id(self):
+#         return str(self.pivot_bussiness_plan_account_id)

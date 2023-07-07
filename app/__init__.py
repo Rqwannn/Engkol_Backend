@@ -5,11 +5,12 @@ from flask_restful import Api
 from flask_talisman import Talisman
 from flask_login import LoginManager
 from flask_cors import CORS
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
 api = Api()
 login_manager = LoginManager()
+
 
 def create_app():
     app = Flask(__name__)

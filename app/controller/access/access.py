@@ -1,11 +1,4 @@
-import uuid
-from datetime import datetime
-from flask_login import current_user, login_required
-from flask import Flask, session
-from flask_restful import Api, Resource, reqparse
-from flask_sqlalchemy import SQLAlchemy
-from app import db
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 
 from app.models.User import Bookkeeping_account, Money_bookkeeping_role
 

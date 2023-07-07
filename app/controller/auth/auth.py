@@ -1,6 +1,5 @@
-from flask import request, abort, jsonify, session
-from flask_restful import Resource, reqparse, fields, marshal_with
-from flask.config import Config
+from flask import request, jsonify
+from flask_restful import Resource
 from app import db
 import datetime
 from sqlalchemy.exc import IntegrityError

@@ -41,7 +41,7 @@ class MoneyBookkkeepingResource(Resource):
 
         return {'message': 'bookkeeping created successfully'}, 201
 
-    def put(self, bookkeeping_id):
+    def put(self, money_bookkeeping_id):
         parser = reqparse.RequestParser()
         parser.add_argument('bookkeeping_ticket', type=str, required=True)
         parser.add_argument('transaction_type_id', type=str, required=True)
@@ -63,7 +63,7 @@ class MoneyBookkkeepingResource(Resource):
             return {'message': 'bookkeeping not found'}, 404
 
     def delete(self, money_bookkeeping_id):
-        values = Bookkeeping_account.query.get(Money_bookkeeping_id)
+        values = Bookkeeping_account.query.get(money_bookkeeping_id)
         if values:
             db.session.delete(values)
             db.session.commit()
