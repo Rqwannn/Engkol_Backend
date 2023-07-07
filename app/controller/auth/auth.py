@@ -52,7 +52,7 @@ class Login(Resource):
         else:
             # Jika autentikasi gagal
             return jsonify ( {
-                "Pesan": "Username atau password salah",
+                "message": "Username atau password salah",
                 "status": 401
             } )
 
@@ -66,10 +66,10 @@ class Register(Resource):
 
         # data validation
         if not username or not password or not email:
-            return jsonify( {"message": "Formulir tidak boleh kosong!"} )
+            return jsonify( {"message": "Formulir tidak boleh kosong!", "status": 401  } )
 
         elif len(password) <= 6:
-            return jsonify( {"message": "Password harus berisi minimal 6 digit!"} )
+            return jsonify( {"message": "Password harus berisi minimal 6 digit!", "status": 401  } )
 
         else:
             # save data to the database
@@ -83,7 +83,10 @@ class Register(Resource):
             except IntegrityError:
                 db.session.rollback()
                 message = 'Username sudah digunakan atau tidak tersedia'
-                return jsonify(message=message)
+                return jsonify({
+                    "message": message,
+                    "status": 401              
+                })
 
             # return json response
             return jsonify({
