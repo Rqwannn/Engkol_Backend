@@ -31,12 +31,15 @@ class ProfileResource(Resource):
     @jwt_required()
     def post(self):
         user_id = get_jwt_identity()
+
+        ####################################################################
         first_name = request.json.get('first_name', None)
         last_name = request.json.get('last_name', None)
         birth_date = request.json.get('birth_date', None)
         telephone_number = request.json.get('telephone_number', None)
         postal_code = request.json.get('postal_code', None)
         address = request.json.get('address', None)
+        ####################################################################
 
         profile = Owner_profile(
             user_id=user_id,
@@ -60,12 +63,15 @@ class ProfileResource(Resource):
         profile=Owner_profile.query.filter_by(user_id=user_id).first()
 
         user_id = get_jwt_identity()
+
+        ####################################################################
         first_name = request.json.get('first_name', profile.first_name)
         last_name = request.json.get('last_name', profile.last_name)
         birth_date = request.json.get('birth_date', profile.birth_date)
         telephone_number = request.json.get('telephone_number', profile.telephone_number)
         postal_code = request.json.get('postal_code', profile.postal_code)
         address = request.json.get('address', profile.address)
+        ####################################################################
 
         if not profile:
             msg_notProfile = 'Profile tidak ditemukan!'

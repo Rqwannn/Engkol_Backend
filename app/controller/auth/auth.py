@@ -67,19 +67,18 @@ class Register(Resource):
         # data validation
         if not username or not password or not email:
             return jsonify( {"message": "Formulir tidak boleh kosong!", "status": 401  } )
-
         elif len(password) <= 6:
             return jsonify( {"message": "Password harus berisi minimal 6 digit!", "status": 401  } )
-
         else:
             # save data to the database
             password_hash = generate_password_hash(password)
-            values = Users(username=username, password=password_hash, email=email)
+            values = Users(username=username, password=password_hash, email=email, is_deleted='0')
 
             # handler if username already use
             try:
                 db.session.add(values) 
                 db.session.commit()
+                token = create_access_token(identity=values.user_id, expires_delta=datetime.timedelta(days=1))
             except IntegrityError:
                 db.session.rollback()
                 message = 'Username sudah digunakan atau tidak tersedia'
@@ -93,7 +92,8 @@ class Register(Resource):
                 "data": {
                     "user_id": values.user_id,
                     "username": values.username,
-                    "email": values.email
+                    "email": values.email,
+                    "token":token
                 },
                 "message": "Registrasi Berhasil",
                 "status": 200

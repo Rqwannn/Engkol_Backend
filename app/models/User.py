@@ -18,9 +18,10 @@ class Users(db.Model, UserMixin, Base):
     is_deleted = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    bookkeeping_account = relationship("Bookkeeping_account", backref='users', lazy=True)
+    # bookkeeping_account = relationship("Bookkeeping_account", backref='users', lazy=True)
     owner_profile = relationship("Owner_profile", backref='users', lazy=True)
     bussiness_plan = relationship("Bussiness_plan", backref="users", lazy=True)
+    Bookkeeping_ticket = relationship("Bookkeeping_ticket", backref="users", lazy=True)
 
     def get_id(self):
         return str(self.user_id)
@@ -49,14 +50,9 @@ class Bookkeeping_account(db.Model, Base):
     __tablename__ = 'bookkeeping_account'
 
     bookkeeping_account_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
-    bookkeeping_ticket_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_ticket.bookkeeping_ticket_id'))
-    role_id = db.Column(db.String(50), db.ForeignKey('money_bookkeeping_role.role_id'))
     name_account = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
     deleted_at = db.Column(db.DateTime)
-
-    activity_role = relationship("Activity_role", backref="bookkeeping_account", lazy=True)
 
     def get_id(self):
         return str(self.bookkeeping_account_id)
@@ -66,27 +62,14 @@ class Money_bookkeeping_role(db.Model, Base):
     __tablename__ = 'money_bookkeeping_role'
 
     role_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    role_name = db.Column(db.String(25))
-    role_status = db.Column(db.String(2))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    role_name = db.Column(db.String(36))
+    # role_status = db.Column(db.String(2))
+    # created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    bookkeeping_account = relationship("Bookkeeping_account", backref="money_bookkeeping_role", lazy=True)
+    bookkeeping_ticket = relationship("Bookkeeping_ticket", backref="Money_bookkeeping_role", lazy=True)
 
     def get_id(self):
         return str(self.role_id)
-
-
-class Activity_role(db.Model, Base):
-    __tablename__ = 'activity_role'
-
-    activity_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    money_bookkeeping_account = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'))
-    activity = db.Column(db.String(255))
-    perubahan = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
-
-    def get_id(self):
-        return str(self.activity_id)
 
 
 class Money_bookkeeping(db.Model, Base):
@@ -112,22 +95,24 @@ class Transaction_type(db.Model, Base):
 
     transaction_type_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
     category_name = db.Column(db.String(36))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    # created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
     money_bookkeeping = relationship("Money_bookkeeping", backref='transaction_type', lazy=True)
 
     def get_id(self):
-        return str(self.transaction_category_id)
+        return str(self.transaction_type_id)
 
 
-class Bookkeeping_ticket(db.Model, Base):
+class Bookkeeping_ticket(db.Model):
     __tablename__ = 'bookkeeping_ticket'
-
     bookkeeping_ticket_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
+    role_id = db.Column(db.String(36), db.ForeignKey('money_bookkeeping_role.role_id'))
+    bookkeeping_account_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    bookkeeping_account = relationship("Bookkeeping_account", backref='tickets', lazy=True)
-    money_bookkeeping = relationship("Money_bookkeeping", backref='ticket', lazy=True)
+    bookkeeping_account = relationship("Bookkeeping_account", backref='Bookkeeping_ticket', lazy=True)
+    money_bookkeeping = relationship("Money_bookkeeping", backref='Bookkeeping_ticket', lazy=True)
 
     def get_id(self):
         return str(self.bookkeeping_ticket_id)
@@ -137,8 +122,7 @@ class Bookkeeping_asets(db.Model, Base):
     __tablename__ = 'bookkeeping_asets'
 
     aset_id = db.Column(db.String(36), primary_key=True, default=str(uuid.uuid4()))
-    money_bookkeeping_id = db.Column(db.String(36), db.ForeignKey('money_bookkeeping.money_bookkeeping_id'),
-                                     nullable=False)
+    money_bookkeeping_id = db.Column(db.String(36), db.ForeignKey('money_bookkeeping.money_bookkeeping_id'), nullable=False)
     nama_barang = db.Column(db.String(36))
     harga = db.Column(db.Integer)
     tanggal_beli = db.Column(db.Date)
@@ -229,7 +213,7 @@ class Bussiness_plan(db.Model):
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
     bussiness_email = db.Column(db.String(100))
     bussiness_type = db.Column(db.String(72))
-    postal_code = db.Column(db.String(36))
+    # postal_code = db.Column(db.String(36))
     bussiness_location = db.Column(db.String(120))
     budgets = db.Column(db.String(120))
     ai_message = db.Column(db.Text)

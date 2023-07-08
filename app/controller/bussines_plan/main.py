@@ -11,7 +11,6 @@ class OpenAIApi(Resource):
     @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
-        print(user_id)
 
         data = Bussiness_plan.query.filter_by(user_id=user_id, is_deleted=0).all()
         result = []
@@ -36,12 +35,13 @@ class OpenAIApi(Resource):
     def post(self):
             user_id = get_jwt_identity()
 
+            ####################################################################
             bussiness_type = request.json.get('bussiness_type', None)
             bussiness_location = request.json.get('bussiness_location', None)
             budgets = request.json.get('budgets', None)
             email = request.json.get('email', None)
             target_market = request.json.get('target_market', None)
-
+            ####################################################################
 
             # connect to openAis
             app = current_app._get_current_object()

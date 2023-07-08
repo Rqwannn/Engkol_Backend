@@ -1,25 +1,19 @@
-from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+from flask import jsonify
+from app.models.User import Bookkeeping_ticket, Money_bookkeeping_role
 
-from app.models.User import Bookkeeping_account, Money_bookkeeping_role
 
-
-# cara pengguaan, di atasnyya dibuat dulu
-# variabel akses yang isinya user yang diijinkan
 @jwt_required()
-# melihat role user
-def WhoAreYou(akses):
+def WhoAreYou(id, akses):
     user_id = get_jwt_identity()
-    jwt_data = get_jwt()
-    nested_session = jwt_data['nested_session']
-    bookkeeping_id = nested_session.get('data')
 
-    account = Bookkeeping_account.query.filter_by(user_id=user_id).first()
-    role = Money_bookkeeping_role.query.filter_by(role_id=account.role_id).first()
-
-    if account.bookkeeping_account_id == bookkeeping_id:
-        if role.role_name in akses:
+    ticket = Bookkeeping_ticket.query.filter_by(user_id=user_id).first
+    if not ticket:
+        return jsonify(message="Anda tidak tertaut ke akun pembukuan uang manapun")
+    
+    tickets = Bookkeeping_ticket.query.filter_by(bookkeeping_account_id=id, user_id=user_id)
+    for ticket in tickets:
+        roles = Money_bookkeeping_role.query.filter_by(role_id=ticket.role_id).first()
+        if roles.role_name in akses:
             return True
-        else:
-            return False
-    else:
-        return False
+    return False 
