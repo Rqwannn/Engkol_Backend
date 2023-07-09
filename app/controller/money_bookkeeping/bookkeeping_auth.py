@@ -88,14 +88,12 @@ class RegisterBookkeeping(Resource):
         ticket = Bookkeeping_account.query.all()
         result = []
         for a in ticket:
-            result.append({
-                "ticket":a.bookkeeping_ticket_id,
-                "time":a.created_at,
-                "role":a.role_id,
-                "name_account":a.name_account,
-                "deleted_at":a.deleted_at,
-                "created_at":a.created_at
-            })
+            if not a.deleted_at:
+                result.append({
+                    "bookkeeping_account_id":a.bookkeeping_account_id,
+                    "name_account":a.name_account,
+                    "created_at":a.created_at
+                })
         return jsonify(ticket=result)
 
     def delete(self):

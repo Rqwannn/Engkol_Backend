@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from flask_restful import Resource
 from app import db
-import datetime
+from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
@@ -67,12 +67,12 @@ class Register(Resource):
         # data validation
         if not username or not password or not email:
             return jsonify( {"message": "Formulir tidak boleh kosong!", "status": 401  } )
-        elif len(password) <= 6:
+        elif len(password) <= 5:
             return jsonify( {"message": "Password harus berisi minimal 6 digit!", "status": 401  } )
         else:
             # save data to the database
             password_hash = generate_password_hash(password)
-            values = Users(username=username, password=password_hash, email=email, is_deleted='0')
+            values = Users(username=username, password=password_hash, email=email, deleted_at=None)
 
             # handler if username already use
             try:
@@ -81,7 +81,7 @@ class Register(Resource):
                 token = create_access_token(identity=values.user_id, expires_delta=datetime.timedelta(days=1))
             except IntegrityError:
                 db.session.rollback()
-                message = 'Username sudah digunakan atau tidak tersedia'
+                message = 'Username atau email sudah digunakan'
                 return jsonify({
                     "message": message,
                     "status": 401              
@@ -98,3 +98,11 @@ class Register(Resource):
                 "message": "Registrasi Berhasil",
                 "status": 200
             })
+        
+    def delete(self, id):
+        plan = Users.query.filter_by(user_id=id).first()
+
+        plan.deleted_at=datetime.utcnow()
+        db.session.commit()
+
+        return jsonify(message="Data berhasil dihapus")
