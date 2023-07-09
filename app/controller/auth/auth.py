@@ -60,9 +60,11 @@ class Login(Resource):
 class Register(Resource):
     def post(self):
         # fetch data
+        ###########################################################
         username = request.json.get('username', None)
         password = request.json.get('password', None)
         email = request.json.get('email', None)
+        ###########################################################
 
         # data validation
         if not username or not password or not email:
@@ -72,7 +74,7 @@ class Register(Resource):
         else:
             # save data to the database
             password_hash = generate_password_hash(password)
-            values = Users(username=username, password=password_hash, email=email, deleted_at=None)
+            values = Users(username=username, password=password_hash, email=email)
 
             # handler if username already use
             try:

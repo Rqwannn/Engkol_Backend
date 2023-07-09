@@ -12,7 +12,7 @@ class Users(db.Model, UserMixin, Base):
     __tablename__ = 'users'
 
     user_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    username = db.Column(db.String(30), unique=True)
+    username = db.Column(db.String(36), unique=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(36))
     deleted_at = db.Column(db.Date)
@@ -56,8 +56,8 @@ class Bookkeeping_account(db.Model, Base):
     deleted_at = db.Column(db.Date)
 
     bookkeeping_activity = relationship("Bookkeeping_activity", backref='bookkeeping_account', lazy=True)
-    bookkeeping_asets = relationship("Money_bookkeeping", backref='Bookkeeping_account', lazy=True)
-
+    bookkeeping_asets = relationship("Asets_activity", backref='Bookkeeping_account', lazy=True)
+    money_bookkeeping = relationship("money_bookkeeping", backref='Bookkeeping_account', lazy=True)
 
     def get_id(self):
         return str(self.bookkeeping_account_id)
@@ -88,8 +88,6 @@ class Money_bookkeeping(db.Model, Base):
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
     deleted_at = db.Column(db.Date)
 
-    bookkeeping_asets = relationship("Bookkeeping_asets", backref='money_bookkeeping', lazy=True)
-    Asets_activity = relationship("Asets_activity", backref='money_bookkeeping', lazy=True)
     bookkeeping_activity = relationship("Bookkeeping_activity", backref='money_bookkeeping', lazy=True)
 
 
@@ -131,7 +129,7 @@ class Bookkeeping_asets(db.Model, Base):
     __tablename__ = 'bookkeeping_asets'
 
     aset_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    money_bookkeeping_id = db.Column(db.String(36), db.ForeignKey('money_bookkeeping.money_bookkeeping_id'), nullable=False)
+    bookkeeping_account_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'), nullable=False)
     nama_barang = db.Column(db.String(36))
     harga_barang = db.Column(db.Integer)
     tanggal_beli = db.Column(db.Date)
@@ -140,7 +138,7 @@ class Bookkeeping_asets(db.Model, Base):
     deleted_at = db.Column(db.Date)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    aset_activity = relationship("aset_activity", backref='bookkeeping_asets', lazy=True)
+    asets_activity = relationship("asets_activity", backref='bookkeeping_asets', lazy=True)
 
     def get_id(self):
         return str(self.aset_id)
@@ -150,7 +148,7 @@ class Asets_activity(db.Model):
 
     asets_activity_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     aset_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_asets.aset_id'), nullable=False)
-    money_bookkeeping_id = db.Column(db.String(36), db.ForeignKey('money_bookkeeping.money_bookkeeping_id'), nullable=False)
+    bookkeeping_account_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'), nullable=False)
     nama_barang = db.Column(db.String(36))
     harga_barang = db.Column(db.Integer)
     tanggal_beli = db.Column(db.Date)
@@ -167,7 +165,7 @@ class Bussiness_plan(db.Model):
 
     bussiness_plan_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
-    bussiness_name = db.Column(db.String(72), db.ForeignKey('users.user_id'))
+    bussiness_name = db.Column(db.String(72))
     bussiness_email = db.Column(db.String(100))
     bussiness_type = db.Column(db.String(72))
     postal_code = db.Column(db.String(36))
