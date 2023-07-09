@@ -120,7 +120,7 @@ class EmployeeResource(Resource):
 
             ###################################################################################
             username = request.json.get('username', None) # username adalah username pegawai
-            posisi = request.json.get('posisi', None)
+            posisi = request.json.get('posisi', None) # ini masih harus didiskusikan apakah posisi langsung di post atau role id nya
             ###################################################################################
             
             role = Money_bookkeeping_role.query.filter_by(role_name=posisi).first()
