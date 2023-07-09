@@ -57,7 +57,7 @@ class Bookkeeping_account(db.Model, Base):
 
     bookkeeping_activity = relationship("Bookkeeping_activity", backref='bookkeeping_account', lazy=True)
     bookkeeping_asets = relationship("Asets_activity", backref='Bookkeeping_account', lazy=True)
-    money_bookkeeping = relationship("money_bookkeeping", backref='Bookkeeping_account', lazy=True)
+    money_bookkeeping = relationship("Money_bookkeeping", backref='Bookkeeping_account', lazy=True)
 
     def get_id(self):
         return str(self.bookkeeping_account_id)
@@ -138,7 +138,7 @@ class Bookkeeping_asets(db.Model, Base):
     deleted_at = db.Column(db.Date)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
 
-    asets_activity = relationship("asets_activity", backref='bookkeeping_asets', lazy=True)
+    asets_activity = relationship("Asets_activity", backref='bookkeeping_asets', lazy=True)
 
     def get_id(self):
         return str(self.aset_id)
