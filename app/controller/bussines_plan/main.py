@@ -5,7 +5,7 @@ from datetime import datetime
 from flask_jwt_extended import get_jwt_identity, jwt_required
 import openai
 
-from app.models.User import Bussiness_plan
+from app.models.User import *
 
 class OpenAIApi(Resource):
 
@@ -102,3 +102,49 @@ class OpenAIApi(Resource):
         db.session.commit()
 
         return jsonify(message=f"Data {plan.bussiness_name} berhasil dihapus")
+    
+    @jwt_required()
+    def put(self, planID):
+        user_id=get_jwt_identity()
+
+        role = Money_bookkeeping_role.query.filter_by(role_name='owner').first()
+        role_id = role.role_id # akan diubah tergantung frontend
+        plan = Bussiness_plan.query.filter_by(bussiness_plan_id=planID).first()
+        name_acc = plan.bussiness_name
+
+        bk_account = Bookkeeping_account(
+            name_account=name_acc
+        )
+
+        db.session.add(bk_account)
+        db.session.commit()
+
+        bk_id = bk_account.bookkeeping_account_id
+
+        bk_ticket = Bookkeeping_ticket(
+            user_id=user_id,
+            role_id=role_id,
+            bookkeeping_account_id=bk_id
+        )
+
+        plan.status = 1
+        db.session.add(bk_ticket)
+        db.session.commit()
+
+        return jsonify({
+            "data":{
+                "ticket":{
+                    "bookkeeping_ticket_id" : bk_ticket.bookkeeping_ticket_id,
+                    "user_id" : bk_ticket.user_id,
+                    "role_id" : bk_ticket.role_id,
+                    "bookkeeping_account_id" : bk_ticket.bookkeeping_account_id,
+                    "created_at" : bk_ticket.created_at
+                },
+                "account":{
+                    "bookkeeping_account_id": bk_account.bookkeeping_account_id,
+                    "name_account": bk_account.name_account,
+                    "created_at": bk_account.created_at,
+                    "deleted_at": bk_account.deleted_at
+                }
+            }
+        })

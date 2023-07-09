@@ -20,7 +20,10 @@ class RoleResource(Resource):
         return jsonify(result)
 
     def post(self):
+
+        ###################################################
         role = request.json.get('role_name', None)
+        ###################################################
 
         db.session.add(Money_bookkeeping_role(role_name=role))
         db.session.commit()
@@ -108,6 +111,7 @@ class RegisterBookkeeping(Resource):
         db.session.commit()
 
         return jsonify(msg="all data deleted")
+    
     
 class EmployeeResource(Resource):
     def post(self, bookkeeping_account_id):
