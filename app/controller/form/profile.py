@@ -1,6 +1,7 @@
 from flask import jsonify, request
 from flask_restful import Resource
 from app import db
+from datetime import datetime
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from app.models.User import Owner_profile
@@ -17,11 +18,16 @@ class ProfileResource(Resource):
             return {"status":"0"}
         else:
             response = [{
+                "profile_id": profile.profile_id,
+                "user_id": profile.user_id,
+                "postal_code": profile.postal_code,
                 "first_name": profile.first_name,
                 "last_name": profile.last_name,
-                "birth_date": profile.birth_date.strftime("%d-%m-%Y"),
+                "birth_date": profile.birth_date,
                 "telephone_number": profile.telephone_number,
-                "address": profile.address
+                "address": profile.address,
+                "deleted_at": profile.deleted_at,
+                "created_at": profile.created_at
             }]
             return jsonify(
                 status=1,
@@ -40,12 +46,14 @@ class ProfileResource(Resource):
         postal_code = request.json.get('postal_code', None)
         address = request.json.get('address', None)
         ####################################################################
+        
+        date = datetime.strptime(birth_date, '%d-%m-%Y').date()
 
         profile = Owner_profile(
             user_id=user_id,
             first_name=first_name,
             last_name=last_name,
-            birth_date=birth_date,
+            birth_date=date,
             telephone_number=telephone_number,
             postal_code=postal_code,
             address=address
@@ -54,8 +62,25 @@ class ProfileResource(Resource):
         db.session.add(profile)
         db.session.commit()
 
+        response = [{
+                "profile_id": profile.profile_id,
+                "user_id": profile.user_id,
+                "postal_code": profile.postal_code,
+                "first_name": profile.first_name,
+                "last_name": profile.last_name,
+                "birth_date": profile.birth_date,
+                "telephone_number": profile.telephone_number,
+                "address": profile.address,
+                "deleted_at": profile.deleted_at,
+                "created_at": profile.created_at
+            }]
+            
         msg = "Profile telah berhasil dibuat!"
-        return jsonify(message=msg)
+        return jsonify(
+            message=msg,
+            data=response
+
+        )
 
     @jwt_required()
     def put(self):
@@ -86,12 +111,16 @@ class ProfileResource(Resource):
             db.session.commit()
 
             msg = 'Profile telah berhasil diubah!'
-            
-            return jsonify(message=msg, data = {
-                "first_name":first_name,
-                "last_name":last_name,
-                "birth_date":birth_date,
-                "telephone_number":telephone_number,
-                "postal_code":postal_code,
-                "address":address
-            })
+            response = [{
+                "profile_id": profile.profile_id,
+                "user_id": profile.user_id,
+                "postal_code": profile.postal_code,
+                "first_name": profile.first_name,
+                "last_name": profile.last_name,
+                "birth_date": profile.birth_date,
+                "telephone_number": profile.telephone_number,
+                "address": profile.address,
+                "deleted_at": profile.deleted_at,
+                "created_at": profile.created_at
+            }]
+            return jsonify(message=msg, data=response)
