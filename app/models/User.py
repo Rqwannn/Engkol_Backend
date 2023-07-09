@@ -83,7 +83,7 @@ class Money_bookkeeping(db.Model, Base):
     bookkeeping_account_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'))
     transaction_type_id = db.Column(db.String(36), db.ForeignKey('transaction_type.transaction_type_id'))
     description = db.Column(db.String(255))
-    balances = db.Column(db.Integer) #####################################################################################satuan
+    balances = db.Column(db.Integer) ##################################################################################### harga satuan
     amount = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow())
     deleted_at = db.Column(db.Date)

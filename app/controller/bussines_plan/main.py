@@ -1,6 +1,7 @@
 from flask import request, jsonify, current_app
 from flask_restful import Resource
 from app import db
+from datetime import datetime
 from flask_jwt_extended import get_jwt_identity, jwt_required
 import openai
 
@@ -12,17 +13,23 @@ class OpenAIApi(Resource):
     def get(self):
         user_id = get_jwt_identity()
 
-        data = Bussiness_plan.query.filter_by(user_id=user_id, is_deleted=0).all()
+        data = Bussiness_plan.query.filter_by(user_id=user_id, deleted_at=None).all()
         result = []
         for plan in data:
             result.append({
-                'bussiness_plan_id': plan.bussiness_plan_id,
-                'bussiness_type': plan.bussiness_type,
-                'bussiness_email': plan.bussiness_email,
-                'target_market':plan.target_market,
-                'location': plan.bussiness_location,
-                'budget': plan.budgets,
-                'created_at': plan.created_at
+                "message":plan.ai_message,
+                "bussiness_plan_id":plan.bussiness_plan_id,
+                "user_id":plan.user_id,
+                "bussiness_name":plan.bussiness_name,
+                "bussiness_email":plan.bussiness_email,
+                "bussiness_type":plan.bussiness_type,
+                "postal_code":plan.postal_code,
+                "bussiness_location":plan.bussiness_location,
+                "budgets":plan.budgets,
+                "target_market":plan.target_market,
+                "status":plan.status,
+                "deleted_at":plan.deleted_at,
+                "created_at":plan.created_at
             })
 
         return jsonify({
@@ -35,13 +42,15 @@ class OpenAIApi(Resource):
     def post(self):
             user_id = get_jwt_identity()
 
-            ####################################################################
+            #######################################################################
+            bussiness_name = request.json.get('bussiness_name', None)
+            bussiness_email = request.json.get('bussiness_email', None)
             bussiness_type = request.json.get('bussiness_type', None)
             bussiness_location = request.json.get('bussiness_location', None)
-            budgets = request.json.get('budgets', None)
-            email = request.json.get('email', None)
+            postal_code = request.json.get('postal_code', None)
             target_market = request.json.get('target_market', None)
-            ####################################################################
+            budgets = request.json.get('budgets', None)
+            ########################################################################
 
             # connect to openAis
             app = current_app._get_current_object()
@@ -54,12 +63,14 @@ class OpenAIApi(Resource):
 
             values = Bussiness_plan(
                 user_id=user_id,
+                bussiness_name=bussiness_name,
+                bussiness_email=bussiness_email,
                 bussiness_type=bussiness_type,
                 bussiness_location=bussiness_location,
+                postal_code=postal_code,
                 budgets=budgets,
-                bussiness_email=email,
                 target_market=target_market,
-                is_deleted=0,
+                deleted_at=None,
                 status=0,
                 ai_message=completed
             )
@@ -68,19 +79,26 @@ class OpenAIApi(Resource):
             db.session.commit()
 
             return jsonify(
-                message=completed + "/n Agar perusahaan anda bisa bertahan lama, sangat perlu melakukan pencatatan keuangan. Mencatat keuangan perusahaan bukanlah hal yang rumit, mencatat pengeluaran dan pemasukan harian sudah cukup untuk memulai mencatat keuangan. /n Anda dapat menggunakan fitur Pencatatan Keuangan yang tersedia di App Engkol yang sedang kamu gunakan ini.",
-                bussiness_type=bussiness_type,
-                bussiness_location=bussiness_location,
-                target_market=target_market,
-                budgets=budgets,
-                bussiness_email=email,
+                message=values.ai_message,
+                bussiness_plan_id=values.bussiness_plan_id,
+                user_id=values.user_id,
+                bussiness_name=values.bussiness_name,
+                bussiness_email=values.bussiness_email,
+                bussiness_type=values.bussiness_type,
+                postal_code=values.postal_code,
+                bussiness_location=values.bussiness_location,
+                budgets=values.budgets,
+                target_market=values.target_market,
+                status=values.status,
+                deleted_at=values.deleted_at,
+                created_at=values.created_at
             )
 
     def delete(self, planID):
 
         plan = Bussiness_plan.query.filter_by(bussiness_plan_id=planID).first()
 
-        plan.is_deleted=1
+        plan.deleted_at=datetime.utcnow()
         db.session.commit()
 
-        return jsonify(message="Data berhasil dihapus")
+        return jsonify(message=f"Data {plan.bussiness_name} berhasil dihapus")
