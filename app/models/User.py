@@ -4,6 +4,7 @@ from app import db
 import uuid
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+import pytz
 
 Base = declarative_base()
 
@@ -16,7 +17,7 @@ class Users(db.Model, UserMixin, Base):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(36))
     deleted_at = db.Column(db.Date)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
     # bookkeeping_account = relationship("Bookkeeping_account", backref='users', lazy=True)
     owner_profile = relationship("Owner_profile", backref='users', lazy=True)
@@ -39,7 +40,7 @@ class Owner_profile(db.Model):
     telephone_number = db.Column(db.String(16))
     address = db.Column(db.Text)
     deleted_at = db.Column(db.Date)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
     def get_id(self):
         return str(self.profile_id)
@@ -52,7 +53,7 @@ class Bookkeeping_account(db.Model, Base):
 
     bookkeeping_account_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name_account = db.Column(db.String(50))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
     deleted_at = db.Column(db.Date)
 
     bookkeeping_activity = relationship("Bookkeeping_activity", backref='bookkeeping_account', lazy=True)
@@ -85,7 +86,7 @@ class Money_bookkeeping(db.Model, Base):
     description = db.Column(db.String(255))
     balances = db.Column(db.Integer) ##################################################################################### harga satuan
     amount = db.Column(db.Integer)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
     deleted_at = db.Column(db.Date)
 
     bookkeeping_activity = relationship("Bookkeeping_activity", backref='money_bookkeeping', lazy=True)
@@ -114,7 +115,7 @@ class Bookkeeping_ticket(db.Model):
     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
     role_id = db.Column(db.String(36), db.ForeignKey('money_bookkeeping_role.role_id'))
     bookkeeping_account_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
     deleted_at = db.Column(db.Date)
 
     bookkeeping_activity = relationship("Bookkeeping_activity", backref='bookkeeping_ticket', lazy=True)
@@ -136,7 +137,7 @@ class Bookkeeping_asets(db.Model, Base):
     barang_baik = db.Column(db.Integer)
     barang_buruk = db.Column(db.Integer)
     deleted_at = db.Column(db.Date)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
     asets_activity = relationship("Asets_activity", backref='bookkeeping_asets', lazy=True)
 
@@ -155,7 +156,7 @@ class Asets_activity(db.Model):
     barang_baik = db.Column(db.Integer)
     barang_buruk = db.Column(db.Integer)
     deleted_at = db.Column(db.Date)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
     def get_id(self):
         return str(self.asets_activity_id)
@@ -175,7 +176,7 @@ class Bussiness_plan(db.Model):
     target_market = db.Column(db.String(120))
     status = db.Column(db.Integer)
     deleted_at = db.Column(db.Date)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
     # pivot_bussiness_bookkeeping = relationship("pivot_bussiness_bookkeeping", backref='bussiness_plan', lazy=True)
 
@@ -193,7 +194,7 @@ class Bookkeeping_activity(db.Model):
     description = db.Column(db.String(255))
     balances = db.Column(db.Integer) #####################################################################################satuan
     amount = db.Column(db.Integer)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow())
+    created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
     deleted_at = db.Column(db.Date)
 
     def get_id(self):
@@ -207,7 +208,7 @@ class Bookkeeping_activity(db.Model):
 #     __tablename__ = 'postal_code_address'
 
 #     postal_code = db.Column(db.String(36), primary_key=True)
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
 #     # owner_profile = relationship("Owner_profile", backref="postal_code_address", lazy=True)
 
@@ -220,7 +221,7 @@ class Bookkeeping_activity(db.Model):
 
 #     province_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 #     province_name = db.Column(db.String(30))
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
 #     regencys_list = relationship("Regencys_list", backref="provinces_list", lazy=True)
 #     pivot_postal_code_location = relationship("Pivot_postal_code_location", backref="provinces_list", lazy=True)
@@ -235,7 +236,7 @@ class Bookkeeping_activity(db.Model):
 #     regency_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 #     regencys_name = db.Column(db.String(30))
 #     provincy_id = db.Column(db.String(36), db.ForeignKey('provinces_list.province_id'), nullable=False)
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
 #     subdistricts_list = relationship("Subdistricts_list", backref="regencys_list", lazy=True)
 #     pivot_postal_code_location = relationship("Pivot_postal_code_location", backref="regencys_list", lazy=True)
@@ -250,7 +251,7 @@ class Bookkeeping_activity(db.Model):
 #     subdistrict_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 #     regency_id = db.Column(db.String(36), db.ForeignKey('regencys_list.regency_id'), nullable=False)
 #     subdistrict_name = db.Column(db.String(30))
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
 #     pivot_postal_code_location = relationship("Pivot_postal_code_location", backref="subdistricts_list", lazy=True)
 
@@ -266,7 +267,7 @@ class Bookkeeping_activity(db.Model):
 #     provinces_id = db.Column(db.String(36), db.ForeignKey('provinces_list.province_id'), nullable=False)
 #     regency_id = db.Column(db.String(36), db.ForeignKey('regencys_list.regency_id'), nullable=False)
 #     subdistricts_id = db.Column(db.String(36), db.ForeignKey('subdistricts_list.subdistrict_id'), nullable=False)
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
 #     def get_id(self):
 #         return str(self.postel_code_location)
@@ -282,7 +283,7 @@ class Bookkeeping_activity(db.Model):
 #     pivot_bussiness_bookkeeping_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 #     bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
 #     bookkeeping_account_id = db.Column(db.String(36), db.ForeignKey('bookkeeping_account.bookkeeping_account_id'))
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
 #     def get_id(self):
 #         return str(self.pivot_bussiness_bookkeeping)
@@ -294,7 +295,7 @@ class Bookkeeping_activity(db.Model):
 #     pivot_bussiness_plan_location_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 #     bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
 #     pivot_postal_code_location_id = db.Column(db.String(36),db.ForeignKey('pivot_postal_code_location.pivot_postal_code_location'))
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
 #     def get_id(self):
 #         return str(self.pivot_bussiness_plan_location_id)
@@ -306,7 +307,7 @@ class Bookkeeping_activity(db.Model):
 #     pivot_bussiness_plan_account_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 #     bussiness_plan_id = db.Column(db.String(36), db.ForeignKey('bussiness_plan.bussiness_plan_id'))
 #     user_id = db.Column(db.String(36), db.ForeignKey('users.user_id'))
-#     created_at = db.Column(db.DateTime, default=datetime.utcnow())
+#     created_at = db.Column(db.DateTime, default=datetime.now(pytz.timezone('Asia/Jakarta')))
 
 #     def get_id(self):
 #         return str(self.pivot_bussiness_plan_account_id)

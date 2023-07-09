@@ -5,16 +5,16 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from app import db
+from app.controller.object.object import *
 
 from app.models.User import *
 
 class PemasukanResource(Resource):
     def get(self, bk_acc_id):
         bks = Money_bookkeeping.query.filter_by(deleted_at=None, bookkeeping_account_id=bk_acc_id)
-        type = Transaction_type.query.filter_by(category_name="pemasukan").first()
         result = []
         for bk in bks:
-            if bks.transaction_type_id == type.transaction_type_id:
+            if bk.transaction_type_id == Query.TransactionTypeId('pemasukan'):
                 result.append({
                     "money_bookkeeping_id":bk.money_bookkeeping_id,
                     "bookkeeping_ticket_id":bk.bookkeeping_ticket_id,
@@ -24,14 +24,10 @@ class PemasukanResource(Resource):
                     "amount":bk.amount,
                     "created_at":bk.created_at
                 })
-        return (result)
+        return jsonify(data=result)
     
-    @jwt_required()
+
     def post(self, bk_acc_id):
-        user_id = get_jwt_identity()
-        tipe_transaksi = Transaction_type.query.filter_by(category_name="pemasukan").first()
-        tipe_pemasukan = tipe_transaksi.transaction_type_id
-        ticket = Bookkeeping_ticket.query.filter_by(user_id=user_id, bookkeeping_account_id=bk_acc_id, deleted_at=None).first()
         
         ####################################################################
         pemasukan = request.json.get('pemasukan', None)
@@ -41,8 +37,8 @@ class PemasukanResource(Resource):
 
         value = Money_bookkeeping(
             bookkeeping_account_id=bk_acc_id,
-            bookkeeping_ticket_id=ticket.bookkeeping_ticket_id,
-            transaction_type_id=tipe_pemasukan,
+            bookkeeping_ticket_id=Access.Ticket(bk_acc_id),
+            transaction_type_id=Query.TransactionTypeId("pemasukan"),
             description=pemasukan,
             balances=balances,
             amount=amount,
@@ -50,6 +46,19 @@ class PemasukanResource(Resource):
         )
 
         db.session.add(value)
+        db.session.commit()
+
+        value2 = Bookkeeping_activity(
+            money_bookkeeping_id=value.money_bookkeeping_id,
+            bookkeeping_account_id=value.bookkeeping_account_id,
+            bookkeeping_ticket_id=value.bookkeeping_ticket_id,
+            transaction_type_id=value.transaction_type_id,
+            description=value.description,
+            balances=value.balances,
+            amount=value.amount,
+            deleted_at=value.deleted_at
+        )
+        db.session.add(value2)
         db.session.commit()
 
         return jsonify({
@@ -62,15 +71,58 @@ class PemasukanResource(Resource):
                 "amount": value.amount,
                 "created_at": value.created_at
         })
+    
+    def put(self, bk_acc_id): ########################### ini isinya bukan bookkeeping account, tapi money bookkeeping id
+        value = Money_bookkeeping.query.filter_by(money_bookkeeping_id=bk_acc_id).first()
+
+        pemasukan = request.json.get('pemasukan', value.description)
+        balances = request.json.get('balances', value.balances)
+        amount = request.json.get('amount', value.amount)
+
+        value.description = pemasukan
+        value.balances = balances
+        value.amount = amount
+        value.bookkeeping_ticket_id = Access.Ticket(value.bookkeeping_account_id)
+
+        db.session.commit()
+
+        value2 = Bookkeeping_activity(
+            money_bookkeeping_id=value.money_bookkeeping_id,
+            bookkeeping_account_id=value.bookkeeping_account_id,
+            bookkeeping_ticket_id=Access.Ticket(value.bookkeeping_account_id),
+            transaction_type_id=value.transaction_type_id,
+            description=value.description,
+            balances=value.balances,
+            amount=value.amount,
+            deleted_at=value.deleted_at
+        )
+
+        db.session.add(value2)
+        db.session.commit()
+
+        return jsonify({
+                "money_bookkeeping_id": value.money_bookkeeping_id,
+                "bookkeeping_ticket_id": value.bookkeeping_ticket_id,
+                "bookkeeping_account_id": value.bookkeeping_account_id,
+                "transaction_type_id": value.transaction_type_id,
+                "pemasukan": value.description,
+                "balances": value.balances,
+                "amount": value.amount,
+                "created_at": value.created_at
+        })
+    
+    def delete(self, bk_acc_id): ########################### ini isinya bukan bookkeeping account, tapi money bookkeeping id
+        value = Money_bookkeeping.query.filter_by(money_bookkeeping_id=bk_acc_id).first()
+        value.deleted_at = datetime.utcnow()
+        db.session.commit()
+        return jsonify(message="Data berhasil dihapus")
 
 
 class TransactionTypeResource(Resource):
 
     def get(self):
-        role = Transaction_type.query.all()
-
         result = []
-        for a in role:
+        for a in Query.All(Transaction_type):
             result.append({
                 "tipe":a.category_name
             })
@@ -88,5 +140,20 @@ class TransactionTypeResource(Resource):
         return jsonify(message='success added')
 
 class BookkeepingAsetsResource(Resource):
-    def get(self):
-        return 0
+    def get(self, bk_acc_id):
+        asets = Bookkeeping_asets.query.filter_by(bookkeeping_account_id=bk_acc_id).all()
+        result = []
+        for aset in asets:
+            result.append({
+                "aset_id": aset.aset_id,
+                "bookkeeping_account_id": aset.bookkeeping_account_id,
+                "nama_barang": aset.nama_barang,
+                "harga_barang": aset.harga_barang,
+                "tanggal_beli": aset.tanggal_beli,
+                "barang_baik": aset.barang_baik,
+                "barang_buruk": aset.barang_buruk,
+                "deleted_at": aset.deleted_at,
+                "created_at": aset.created_at
+            })
+ 
+        return jsonify(data=result)

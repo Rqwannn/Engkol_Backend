@@ -3,15 +3,13 @@ from flask_restful import Resource
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from app.models.User import *
-from app.controller.access.access import WhoAreYou
+from app.controller.object.object import *
 
 
 class RoleResource(Resource):
     def get (self):
-        role = Money_bookkeeping_role.query.all()
-
         result = []
-        for a in role:
+        for a in Query.All(Money_bookkeeping_role):
             result.append({
                 "role_id":a.role_id,
                 "role_name":a.role_name
@@ -88,9 +86,8 @@ class RegisterBookkeeping(Resource):
     
     # sementara
     def get(self):
-        ticket = Bookkeeping_account.query.all()
         result = []
-        for a in ticket:
+        for a in Query.All(Bookkeeping_account):
             if not a.deleted_at:
                 result.append({
                     "bookkeeping_account_id":a.bookkeeping_account_id,
@@ -100,23 +97,18 @@ class RegisterBookkeeping(Resource):
         return jsonify(ticket=result)
 
     def delete(self):
-        role = Bookkeeping_account.query.all()
-        for a in role:
+        for a in Query.All(Bookkeeping_account):
             db.session.delete(a)
         db.session.commit()
 
-        ticket = Bookkeeping_ticket.query.all()
-        for a in ticket:
-            db.session.delete(a)
-        db.session.commit()
 
         return jsonify(msg="all data deleted")
     
     
 class EmployeeResource(Resource):
     def post(self, bookkeeping_account_id):
-        akses = ['owner']
-        if WhoAreYou(bookkeeping_account_id, akses) == True:
+        akses = ['owner', 'manager']
+        if Access.WhoAreYou(bookkeeping_account_id, akses) == True:
 
             ###################################################################################
             username = request.json.get('username', None) # username adalah username pegawai
@@ -126,27 +118,31 @@ class EmployeeResource(Resource):
             role = Money_bookkeeping_role.query.filter_by(role_name=posisi).first()
             role_id = role.role_id # akan diubah tergantung frontend
             user = Users.query.filter_by(username=username).first()
+            ticket = Bookkeeping_ticket.query.filter_by(user_id=user.user_id).first()
 
             if not user:
                 return jsonify(message="Username tidak ditemukan")
             
-            ticket = Bookkeeping_ticket(
-                user_id=user.user_id,
-                role_id=role_id,
-                bookkeeping_account_id=bookkeeping_account_id
-            )
+            if not ticket:
+                ticket = Bookkeeping_ticket(
+                    user_id=user.user_id,
+                    role_id=role_id,
+                    bookkeeping_account_id=bookkeeping_account_id
+                )
 
-            db.session.add(ticket)
-            db.session.commit()
+                db.session.add(ticket)
+                db.session.commit()
 
-            return jsonify({
-                "ticket":{
-                        "bookkeeping_ticket_id" : ticket.bookkeeping_ticket_id,
-                        "user_id" : ticket.user_id,
-                        "role_id" : ticket.role_id,
-                        "bookkeeping_account_id" : ticket.bookkeeping_account_id,
-                        "created_at" : ticket.created_at
-                    }
-            })
+                return jsonify({
+                    "ticket":{
+                            "bookkeeping_ticket_id" : ticket.bookkeeping_ticket_id,
+                            "user_id" : ticket.user_id,
+                            "role_id" : ticket.role_id,
+                            "bookkeeping_account_id" : ticket.bookkeeping_account_id,
+                            "created_at" : ticket.created_at
+                        }
+                })
+            else:
+                return jsonify(message=f"{username} sudah terdaftar")
         else:
             return jsonify(message="Anda tidak diijinkan menambahkan data karyawan")
