@@ -2,6 +2,7 @@ from flask import request, jsonify, current_app
 from flask_restful import Resource
 from app import db
 from datetime import datetime
+import pytz
 from flask_jwt_extended import get_jwt_identity, jwt_required
 import openai
 
@@ -13,7 +14,7 @@ class OpenAIApi(Resource):
     def get(self):
         user_id = get_jwt_identity()
 
-        data = Bussiness_plan.query.filter_by(user_id=user_id, deleted_at=None).all()
+        data = Bussiness_plan.query.filter_by(user_id=user_id, is_deleted=0).all()
         result = []
         for plan in data:
             result.append({
@@ -28,7 +29,7 @@ class OpenAIApi(Resource):
                 "budgets":plan.budgets,
                 "target_market":plan.target_market,
                 "status":plan.status,
-                "deleted_at":plan.deleted_at,
+                "is_deleted":plan.is_deleted,
                 "created_at":plan.created_at
             })
 
@@ -70,7 +71,7 @@ class OpenAIApi(Resource):
                 postal_code=postal_code,
                 budgets=budgets,
                 target_market=target_market,
-                deleted_at=None,
+                is_deleted=0,
                 status=0,
                 ai_message=completed
             )
@@ -90,7 +91,7 @@ class OpenAIApi(Resource):
                 budgets=values.budgets,
                 target_market=values.target_market,
                 status=values.status,
-                deleted_at=values.deleted_at,
+                is_deleted=values.is_deleted,
                 created_at=values.created_at
             )
 
@@ -98,7 +99,7 @@ class OpenAIApi(Resource):
 
         plan = Bussiness_plan.query.filter_by(bussiness_plan_id=planID).first()
 
-        plan.deleted_at=datetime.utcnow()
+        plan.is_deleted=1
         db.session.commit()
 
         return jsonify(message=f"Data {plan.bussiness_name} berhasil dihapus")
@@ -110,10 +111,12 @@ class OpenAIApi(Resource):
         role = Money_bookkeeping_role.query.filter_by(role_name='owner').first()
         role_id = role.role_id # akan diubah tergantung frontend
         plan = Bussiness_plan.query.filter_by(bussiness_plan_id=planID).first()
-        name_acc = plan.bussiness_name
 
         bk_account = Bookkeeping_account(
-            name_account=name_acc
+            name_account=plan.bussiness_name,
+            bussiness_email=plan.bussiness_email,
+            bussiness_location=plan.bussiness_location,
+            postal_code=plan.postal_code
         )
 
         db.session.add(bk_account)
@@ -124,7 +127,8 @@ class OpenAIApi(Resource):
         bk_ticket = Bookkeeping_ticket(
             user_id=user_id,
             role_id=role_id,
-            bookkeeping_account_id=bk_id
+            bookkeeping_account_id=bk_id,
+            landing_status=1
         )
 
         plan.status = 1
@@ -143,8 +147,10 @@ class OpenAIApi(Resource):
                 "account":{
                     "bookkeeping_account_id": bk_account.bookkeeping_account_id,
                     "name_account": bk_account.name_account,
-                    "created_at": bk_account.created_at,
-                    "deleted_at": bk_account.deleted_at
+                    "bussiness_email": bk_account.bussiness_email,
+                    "bussiness_location": bk_account.bussiness_location,
+                    "postal_code": bk_account.postal_code,
+                    "created_at": bk_account.created_at
                 }
             }
         })

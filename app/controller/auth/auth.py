@@ -2,6 +2,7 @@ from flask import request, jsonify
 from flask_restful import Resource
 from app import db
 from datetime import datetime
+import pytz
 import datetime
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -105,7 +106,7 @@ class Register(Resource):
     def delete(self, id):
         plan = Users.query.filter_by(user_id=id).first()
 
-        plan.deleted_at=datetime.utcnow()
+        plan.deleted_at=datetime.now(pytz.timezone('Asia/Jakarta'))
         db.session.commit()
 
         return jsonify(message="Data berhasil dihapus")

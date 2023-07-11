@@ -22,12 +22,10 @@ class Access():
     @jwt_required()
     def Ticket(bk_id):
         user_id = get_jwt_identity()
-        ticket = Bookkeeping_ticket.query.filter_by(user_id=user_id).first()
-        if not ticket:
-            return jsonify(message="Anda tidak tertaut ke akun pembukuan uang")
-        tickets = Bookkeeping_ticket.query.filter_by(bookkeeping_account_id=bk_id, user_id=user_id, deleted_at=None).first()
-        return tickets.bookkeeping_ticket_id
-    
+        ticket = Bookkeeping_ticket.query.filter_by(user_id=user_id, bookkeeping_account_id=bk_id, is_deleted=0).first()
+        return ticket.bookkeeping_ticket_id
+        
+        
 class Query():
     def All(table):
         result = table.query.all()

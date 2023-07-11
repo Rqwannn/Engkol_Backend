@@ -26,7 +26,7 @@ class ProfileResource(Resource):
                 "birth_date": profile.birth_date,
                 "telephone_number": profile.telephone_number,
                 "address": profile.address,
-                "deleted_at": profile.deleted_at,
+                "is_deleted": profile.is_deleted,
                 "created_at": profile.created_at
             }]
             return jsonify(
@@ -71,7 +71,7 @@ class ProfileResource(Resource):
                 "birth_date": profile.birth_date,
                 "telephone_number": profile.telephone_number,
                 "address": profile.address,
-                "deleted_at": profile.deleted_at,
+                "is_deleted": profile.is_deleted,
                 "created_at": profile.created_at
             }]
             
@@ -120,7 +120,7 @@ class ProfileResource(Resource):
                 "birth_date": profile.birth_date,
                 "telephone_number": profile.telephone_number,
                 "address": profile.address,
-                "deleted_at": profile.deleted_at,
+                "is_deleted": profile.is_deleted,
                 "created_at": profile.created_at
             }]
             return jsonify(message=msg, data=response)
