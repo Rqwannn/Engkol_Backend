@@ -22,7 +22,7 @@ def create_app():
     jwt = JWTManager(app)
     db.init_app(app)
 
-    # Talisman(app, content_security_policy=None, force_https=True, strict_transport_security=True)
+    Talisman(app, content_security_policy=None, force_https=True, strict_transport_security=True)
 
     # atur origins (domain yang di izinkan) jika sudah tahap produksi
     CORS(app, resources={r"/*": {"origins": "*"}})
