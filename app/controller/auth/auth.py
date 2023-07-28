@@ -8,6 +8,8 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
+from app.controller.encryption import *
+
 from app.models.User import Users
 
 # Bikin logika login di sini
@@ -19,8 +21,8 @@ class Login(Resource):
         user_id = get_jwt_identity()
         value = Users.query.filter_by(user_id=user_id).first()
         return jsonify(
-            username=value.username,
-            email=value.email
+            username=decrypt(value.username),
+            email=decrypt(value.email)
         )
 
     def post(self):
@@ -45,8 +47,8 @@ class Login(Resource):
                 "token" : token,
                 "data": {
                     "user_id": user.user_id,
-                    "username": user.username,
-                    "email": user.email
+                    "username": decrypt(user.username),
+                    "email": decrypt(user.email)
                 },
                 "status": 200
             } )
@@ -76,7 +78,7 @@ class Register(Resource):
         else:
             # save data to the database
             password_hash = generate_password_hash(password)
-            values = Users(username=username, password=password_hash, email=email)
+            values = Users(username=encrypt(username), password=password_hash, email=encrypt(email))
 
             # handler if username already use
             try:
@@ -95,8 +97,8 @@ class Register(Resource):
             return jsonify({
                 "data": {
                     "user_id": values.user_id,
-                    "username": values.username,
-                    "email": values.email,
+                    "username": decrypt(values.username),
+                    "email": decrypt(values.email),
                     "token":token
                 },
                 "message": "Registrasi Berhasil",

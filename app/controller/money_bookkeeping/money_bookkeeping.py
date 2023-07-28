@@ -9,6 +9,7 @@ from app import db
 from app.controller.object.object import *
 
 from app.models.User import *
+from app.controller.encryption import *
 
 class PemasukanResource(Resource): # MASUK # MASUK # MASUK # MASUK # MASUK # MASUK # MASUK # MASUK #
     def get(self, bk_acc_id):
@@ -20,9 +21,9 @@ class PemasukanResource(Resource): # MASUK # MASUK # MASUK # MASUK # MASUK # MAS
                     "money_bookkeeping_id":bk.money_bookkeeping_id,
                     "bookkeeping_ticket_id":bk.bookkeeping_ticket_id,
                     "bookkeeping_account_id":bk.bookkeeping_account_id,
-                    "nama_pemasukan":bk.description,
-                    "balances":bk.balances,
-                    "amount":bk.amount,
+                    "nama_pemasukan": decrypt(bk.description),
+                    "balances": decrypt(bk.balances),
+                    "amount": decrypt(bk.amount),
                     "created_at":bk.created_at
                 })
         return jsonify(data=result)
@@ -40,9 +41,9 @@ class PemasukanResource(Resource): # MASUK # MASUK # MASUK # MASUK # MASUK # MAS
             bookkeeping_account_id=bk_acc_id,
             bookkeeping_ticket_id=Access.Ticket(bk_acc_id),
             transaction_type_id=Query.TransactionTypeId("pemasukan"),
-            description=pemasukan,
-            balances=balances,
-            amount=amount,
+            description=encrypt(pemasukan),
+            balances=encrypt(balances),
+            amount=encrypt(amount),
             is_deleted=0
         )
 
@@ -67,22 +68,22 @@ class PemasukanResource(Resource): # MASUK # MASUK # MASUK # MASUK # MASUK # MAS
                 "bookkeeping_ticket_id": value.bookkeeping_ticket_id,
                 "bookkeeping_account_id": value.bookkeeping_account_id,
                 "transaction_type_id": value.transaction_type_id,
-                "nama_pemasukan": value.description,
-                "balances": value.balances,
-                "amount": value.amount,
+                "nama_pemasukan": decrypt(value.description),
+                "balances": decrypt(value.balances),
+                "amount": decrypt(value.amount),
                 "created_at": value.created_at
         })
     
     def put(self, bk_acc_id): ########################### ini isinya bukan bookkeeping account, tapi money bookkeeping id
         value = Money_bookkeeping.query.filter_by(money_bookkeeping_id=bk_acc_id).first()
 
-        pemasukan = request.json.get('pemasukan', value.description)
-        balances = request.json.get('balances', value.balances)
-        amount = request.json.get('amount', value.amount)
+        pemasukan = request.json.get('pemasukan', decrypt(value.description))
+        balances = request.json.get('balances', decrypt(value.balances))
+        amount = request.json.get('amount', decrypt(value.amount))
 
-        value.description = pemasukan
-        value.balances = balances
-        value.amount = amount
+        value.description = encrypt(pemasukan)
+        value.balances = encrypt(balances)
+        value.amount = encrypt(amount)
         value.bookkeeping_ticket_id = Access.Ticket(value.bookkeeping_account_id)
 
         db.session.commit()
@@ -106,9 +107,9 @@ class PemasukanResource(Resource): # MASUK # MASUK # MASUK # MASUK # MASUK # MAS
                 "bookkeeping_ticket_id": value.bookkeeping_ticket_id,
                 "bookkeeping_account_id": value.bookkeeping_account_id,
                 "transaction_type_id": value.transaction_type_id,
-                "nama_pemasukan": value.description,
-                "balances": value.balances,
-                "amount": value.amount,
+                "nama_pemasukan": decrypt(value.description),
+                "balances": decrypt(value.balances),
+                "amount": decrypt(value.amount),
                 "created_at": value.created_at
         })
     
@@ -145,9 +146,9 @@ class PengeluaranResource(Resource): # KELUAR # KELUAR # KELUAR # KELUAR # KELUA
                     "money_bookkeeping_id":bk.money_bookkeeping_id,
                     "bookkeeping_ticket_id":bk.bookkeeping_ticket_id,
                     "bookkeeping_account_id":bk.bookkeeping_account_id,
-                    "nama_pengeluaran":bk.description,
-                    "balances":bk.balances,
-                    "amount":bk.amount,
+                    "nama_pengeluaran": decrypt(bk.description),
+                    "balances": decrypt(bk.balances),
+                    "amount": decrypt(bk.amount),
                     "created_at":bk.created_at
                 })
         return jsonify(data=result)
@@ -165,9 +166,9 @@ class PengeluaranResource(Resource): # KELUAR # KELUAR # KELUAR # KELUAR # KELUA
             bookkeeping_account_id=bk_acc_id,
             bookkeeping_ticket_id=Access.Ticket(bk_acc_id),
             transaction_type_id=Query.TransactionTypeId("pengeluaran"),
-            description=pengeluaran,
-            balances=balances,
-            amount=amount,
+            description=encrypt(pengeluaran),
+            balances=encrypt(balances),
+            amount=encrypt(amount),
             is_deleted=0
         )
 
@@ -192,22 +193,22 @@ class PengeluaranResource(Resource): # KELUAR # KELUAR # KELUAR # KELUAR # KELUA
                 "bookkeeping_ticket_id": value.bookkeeping_ticket_id,
                 "bookkeeping_account_id": value.bookkeeping_account_id,
                 "transaction_type_id": value.transaction_type_id,
-                "nama_pengeluaran": value.description,
-                "balances": value.balances,
-                "amount": value.amount,
+                "nama_pengeluaran": decrypt(value.description),
+                "balances": decrypt(value.balances),
+                "amount": decrypt(value.amount),
                 "created_at": value.created_at
         })
     
     def put(self, bk_acc_id): ########################### ini isinya bukan bookkeeping account, tapi money bookkeeping id
         value = Money_bookkeeping.query.filter_by(money_bookkeeping_id=bk_acc_id).first()
 
-        pengeluaran = request.json.get('pengeluaran', value.description)
-        balances = request.json.get('balances', value.balances)
-        amount = request.json.get('amount', value.amount)
+        pengeluaran = request.json.get('pengeluaran', decrypt(value.description))
+        balances = request.json.get('balances', decrypt(value.balances))
+        amount = request.json.get('amount', decrypt(value.amount))
 
-        value.description = pengeluaran
-        value.balances = balances
-        value.amount = amount
+        value.description = encrypt(pengeluaran)
+        value.balances = encrypt(balances)
+        value.amount = encrypt(amount)
         value.bookkeeping_ticket_id = Access.Ticket(value.bookkeeping_account_id)
 
         db.session.commit()
@@ -231,9 +232,9 @@ class PengeluaranResource(Resource): # KELUAR # KELUAR # KELUAR # KELUAR # KELUA
                 "bookkeeping_ticket_id": value.bookkeeping_ticket_id,
                 "bookkeeping_account_id": value.bookkeeping_account_id,
                 "transaction_type_id": value.transaction_type_id,
-                "nama_pengeluaran": value.description,
-                "balances": value.balances,
-                "amount": value.amount,
+                "nama_pengeluaran": decrypt(value.description),
+                "balances": decrypt(value.balances),
+                "amount": decrypt(value.amount),
                 "created_at": value.created_at
         })
     
@@ -270,9 +271,9 @@ class UtangResource(Resource): # UTANG # UTANG # UTANG # UTANG # UTANG # UTANG #
                     "money_bookkeeping_id":bk.money_bookkeeping_id,
                     "bookkeeping_ticket_id":bk.bookkeeping_ticket_id,
                     "bookkeeping_account_id":bk.bookkeeping_account_id,
-                    "nama_pemberi_utang":bk.description,
-                    "balances":bk.balances,
-                    "periode_utang":bk.amount,
+                    "nama_pemberi_utang": decrypt(bk.description),
+                    "balances": decrypt(bk.balances),
+                    "periode_utang": decrypt(bk.amount),
                     "created_at":bk.created_at
                 })
         return jsonify(data=result)
@@ -290,9 +291,9 @@ class UtangResource(Resource): # UTANG # UTANG # UTANG # UTANG # UTANG # UTANG #
             bookkeeping_account_id=bk_acc_id,
             bookkeeping_ticket_id=Access.Ticket(bk_acc_id),
             transaction_type_id=Query.TransactionTypeId("utang"),
-            description=utang,
-            balances=balances,
-            amount=periode_utang,
+            description=encrypt(utang),
+            balances=encrypt(balances),
+            amount=encrypt(periode_utang),
             is_deleted=0
         )
 
@@ -317,22 +318,22 @@ class UtangResource(Resource): # UTANG # UTANG # UTANG # UTANG # UTANG # UTANG #
                 "bookkeeping_ticket_id": value.bookkeeping_ticket_id,
                 "bookkeeping_account_id": value.bookkeeping_account_id,
                 "transaction_type_id": value.transaction_type_id,
-                "nama_pemberi_utang": value.description,
-                "balances": value.balances,
-                "periode_utang": value.amount,
+                "nama_pemberi_utang": decrypt(value.description),
+                "balances": decrypt(value.balances),
+                "periode_utang": decrypt(value.amount),
                 "created_at": value.created_at
         })
     
     def put(self, bk_acc_id): ########################### ini isinya bukan bookkeeping account, tapi money bookkeeping id
         value = Money_bookkeeping.query.filter_by(money_bookkeeping_id=bk_acc_id).first()
 
-        utang = request.json.get('utang', value.description)
-        balances = request.json.get('balances', value.balances)
-        amount = request.json.get('amount', value.amount)
+        utang = request.json.get('utang', decrypt(value.description))
+        balances = request.json.get('balances', decrypt(value.balances))
+        amount = request.json.get('amount', decrypt(value.amount))
 
-        value.description = utang
-        value.balances = balances
-        value.amount = amount
+        value.description = encrypt(utang)
+        value.balances = encrypt(balances)
+        value.amount = encrypt(amount)
         value.bookkeeping_ticket_id = Access.Ticket(value.bookkeeping_account_id)
 
         db.session.commit()
@@ -356,9 +357,9 @@ class UtangResource(Resource): # UTANG # UTANG # UTANG # UTANG # UTANG # UTANG #
                 "bookkeeping_ticket_id": value.bookkeeping_ticket_id,
                 "bookkeeping_account_id": value.bookkeeping_account_id,
                 "transaction_type_id": value.transaction_type_id,
-                "nama_pemberi_utang": value.description,
-                "balances": value.balances,
-                "periode_utang": value.amount,
+                "nama_pemberi_utang": decrypt(value.description),
+                "balances": decrypt(value.balances),
+                "periode_utang": decrypt(value.amount),
                 "created_at": value.created_at
         })
     
@@ -395,9 +396,9 @@ class PiutangResource(Resource): # PIUTANG # PIUTANG # PIUTANG # PIUTANG # PIUTA
                     "money_bookkeeping_id":bk.money_bookkeeping_id,
                     "bookkeeping_ticket_id":bk.bookkeeping_ticket_id,
                     "bookkeeping_account_id":bk.bookkeeping_account_id,
-                    "nama_pengutang":bk.description,
-                    "balances":bk.balances,
-                    "periode_piutang":bk.amount,
+                    "nama_pengutang": decrypt(bk.description),
+                    "balances": decrypt(bk.balances),
+                    "periode_piutang": decrypt(bk.amount),
                     "created_at":bk.created_at
                 })
         return jsonify(data=result)
@@ -415,9 +416,9 @@ class PiutangResource(Resource): # PIUTANG # PIUTANG # PIUTANG # PIUTANG # PIUTA
             bookkeeping_account_id=bk_acc_id,
             bookkeeping_ticket_id=Access.Ticket(bk_acc_id),
             transaction_type_id=Query.TransactionTypeId("piutang"),
-            description=piutang,
-            balances=balances,
-            amount=periode_piutang,
+            description=encrypt(piutang),
+            balances=encrypt(balances),
+            amount=encrypt(periode_piutang),
             is_deleted=0
         )
 
@@ -442,22 +443,22 @@ class PiutangResource(Resource): # PIUTANG # PIUTANG # PIUTANG # PIUTANG # PIUTA
                 "bookkeeping_ticket_id": value.bookkeeping_ticket_id,
                 "bookkeeping_account_id": value.bookkeeping_account_id,
                 "transaction_type_id": value.transaction_type_id,
-                "nama_pengutang": value.description,
-                "balances": value.balances,
-                "periode_piutang": value.amount,
+                "nama_pengutang": decrypt(value.description),
+                "balances": decrypt(value.balances),
+                "periode_piutang": decrypt(value.amount),
                 "created_at": value.created_at
         })
     
     def put(self, bk_acc_id): ########################### ini isinya bukan bookkeeping account, tapi money bookkeeping id
         value = Money_bookkeeping.query.filter_by(money_bookkeeping_id=bk_acc_id).first()
 
-        piutang = request.json.get('piutang', value.description)
-        balances = request.json.get('balances', value.balances)
-        amount = request.json.get('amount', value.amount)
+        piutang = request.json.get('piutang', decrypt(value.description))
+        balances = request.json.get('balances', decrypt(value.balances))
+        amount = request.json.get('amount', decrypt(value.amount))
 
-        value.description = piutang
-        value.balances = balances
-        value.amount = amount
+        value.description = encrypt(piutang)
+        value.balances = encrypt(balances)
+        value.amount = encrypt(amount)
         value.bookkeeping_ticket_id = Access.Ticket(value.bookkeeping_account_id)
 
         db.session.commit()
@@ -481,9 +482,9 @@ class PiutangResource(Resource): # PIUTANG # PIUTANG # PIUTANG # PIUTANG # PIUTA
                 "bookkeeping_ticket_id": value.bookkeeping_ticket_id,
                 "bookkeeping_account_id": value.bookkeeping_account_id,
                 "transaction_type_id": value.transaction_type_id,
-                "nama_piutang": value.description,
-                "balances": value.balances,
-                "periode_piutang": value.amount,
+                "nama_piutang": decrypt(value.description),
+                "balances": decrypt(value.balances),
+                "periode_piutang": decrypt(value.amount),
                 "created_at": value.created_at
         })
     

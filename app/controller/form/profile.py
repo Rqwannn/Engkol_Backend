@@ -5,6 +5,7 @@ from datetime import datetime
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from app.models.User import Owner_profile
+from app.controller.encryption import *
 
 class ProfileResource(Resource):
     
@@ -20,12 +21,12 @@ class ProfileResource(Resource):
             response = [{
                 "profile_id": profile.profile_id,
                 "user_id": profile.user_id,
-                "postal_code": profile.postal_code,
-                "first_name": profile.first_name,
-                "last_name": profile.last_name,
+                "postal_code": decrypt(profile.postal_code),
+                "first_name": decrypt(profile.first_name),
+                "last_name": decrypt(profile.last_name),
                 "birth_date": profile.birth_date,
-                "telephone_number": profile.telephone_number,
-                "address": profile.address,
+                "telephone_number": decrypt(profile.telephone_number),
+                "address": decrypt(profile.address),
                 "is_deleted": profile.is_deleted,
                 "created_at": profile.created_at
             }]
@@ -51,12 +52,12 @@ class ProfileResource(Resource):
 
         profile = Owner_profile(
             user_id=user_id,
-            first_name=first_name,
-            last_name=last_name,
+            first_name=encrypt(first_name),
+            last_name=encrypt(last_name),
             birth_date=date,
-            telephone_number=telephone_number,
-            postal_code=postal_code,
-            address=address
+            telephone_number=encrypt(telephone_number),
+            postal_code=encrypt(postal_code),
+            address=encrypt(address)
         )
 
         db.session.add(profile)
@@ -90,36 +91,36 @@ class ProfileResource(Resource):
         user_id = get_jwt_identity()
 
         ####################################################################
-        first_name = request.json.get('first_name', profile.first_name)
-        last_name = request.json.get('last_name', profile.last_name)
-        birth_date = request.json.get('birth_date', profile.birth_date)
-        telephone_number = request.json.get('telephone_number', profile.telephone_number)
-        postal_code = request.json.get('postal_code', profile.postal_code)
-        address = request.json.get('address', profile.address)
+        first_name = request.json.get('first_name', decrypt(profile.first_name))
+        last_name = request.json.get('last_name', decrypt(profile.last_name))
+        birth_date = request.json.get('birth_date', decrypt(profile.birth_date))
+        telephone_number = request.json.get('telephone_number', decrypt(profile.telephone_number))
+        postal_code = request.json.get('postal_code', decrypt(profile.postal_code))
+        address = request.json.get('address', decrypt(profile.address))
         ####################################################################
 
         if not profile:
             msg_notProfile = 'Profile tidak ditemukan!'
             return jsonify(message=msg_notProfile)
         else:
-            profile.first_name = first_name
-            profile.last_name = last_name
-            profile.birth_date = birth_date
-            profile.telephone_number = telephone_number
-            profile.postal_code = postal_code
-            profile.address = address
+            profile.first_name = encrypt(first_name)
+            profile.last_name = encrypt(last_name)
+            profile.birth_date = encrypt(birth_date)
+            profile.telephone_number = encrypt(telephone_number)
+            profile.postal_code = encrypt(postal_code)
+            profile.address = encrypt(address)
             db.session.commit()
 
             msg = 'Profile telah berhasil diubah!'
             response = [{
                 "profile_id": profile.profile_id,
                 "user_id": profile.user_id,
-                "postal_code": profile.postal_code,
-                "first_name": profile.first_name,
-                "last_name": profile.last_name,
+                "postal_code": decrypt(profile.postal_code),
+                "first_name": decrypt(profile.first_name),
+                "last_name": decrypt(profile.last_name),
                 "birth_date": profile.birth_date,
-                "telephone_number": profile.telephone_number,
-                "address": profile.address,
+                "telephone_number": decrypt(profile.telephone_number),
+                "address": decrypt(profile.address),
                 "is_deleted": profile.is_deleted,
                 "created_at": profile.created_at
             }]

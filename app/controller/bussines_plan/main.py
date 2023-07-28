@@ -7,6 +7,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 import openai
 
 from app.models.User import *
+from app.controller.encryption import *
 
 class OpenAIApi(Resource):
 
@@ -18,19 +19,19 @@ class OpenAIApi(Resource):
         result = []
         for plan in data:
             result.append({
-                "message":plan.ai_message,
+                "message":decrypt(plan.ai_message),
                 "bussiness_plan_id":plan.bussiness_plan_id,
                 "user_id":plan.user_id,
-                "bussiness_name":plan.bussiness_name,
-                "bussiness_email":plan.bussiness_email,
-                "bussiness_type":plan.bussiness_type,
-                "postal_code":plan.postal_code,
-                "bussiness_location":plan.bussiness_location,
-                "budgets":plan.budgets,
-                "target_market":plan.target_market,
-                "status":plan.status,
-                "is_deleted":plan.is_deleted,
-                "created_at":plan.created_at
+                "bussiness_name":decrypt(plan.bussiness_name),
+                "bussiness_email":decrypt(plan.bussiness_email),
+                "bussiness_type":decrypt(plan.bussiness_type),
+                "postal_code":decrypt(plan.postal_code),
+                "bussiness_location":decrypt(plan.bussiness_location),
+                "budgets":decrypt(plan.budgets),
+                "target_market":decrypt(plan.target_market),
+                "status": plan.status,
+                "is_deleted": plan.is_deleted,
+                "created_at": plan.created_at
             })
 
         return jsonify({
@@ -64,32 +65,32 @@ class OpenAIApi(Resource):
 
             values = Bussiness_plan(
                 user_id=user_id,
-                bussiness_name=bussiness_name,
-                bussiness_email=bussiness_email,
-                bussiness_type=bussiness_type,
-                bussiness_location=bussiness_location,
-                postal_code=postal_code,
-                budgets=budgets,
-                target_market=target_market,
+                bussiness_name=encrypt(bussiness_name),
+                bussiness_email=encrypt(bussiness_email),
+                bussiness_type=encrypt(bussiness_type),
+                bussiness_location=encrypt(bussiness_location),
+                postal_code=encrypt(postal_code),
+                budgets=encrypt(budgets),
+                target_market=encrypt(target_market),
                 is_deleted=0,
                 status=0,
-                ai_message=completed
+                ai_message=encrypt(completed)
             )
 
             db.session.add(values)
             db.session.commit()
 
             return jsonify(
-                message=values.ai_message,
+                message=decrypt(values.ai_message),
                 bussiness_plan_id=values.bussiness_plan_id,
                 user_id=values.user_id,
-                bussiness_name=values.bussiness_name,
-                bussiness_email=values.bussiness_email,
-                bussiness_type=values.bussiness_type,
-                postal_code=values.postal_code,
-                bussiness_location=values.bussiness_location,
-                budgets=values.budgets,
-                target_market=values.target_market,
+                bussiness_name=decrypt(values.bussiness_name),
+                bussiness_email=decrypt(values.bussiness_email),
+                bussiness_type=decrypt(values.bussiness_type),
+                postal_code=decrypt(values.postal_code),
+                bussiness_location=decrypt(values.bussiness_location),
+                budgets=decrypt(values.budgets),
+                target_market=decrypt(values.target_market),
                 status=values.status,
                 is_deleted=values.is_deleted,
                 created_at=values.created_at
@@ -102,7 +103,7 @@ class OpenAIApi(Resource):
         plan.is_deleted=1
         db.session.commit()
 
-        return jsonify(message=f"Data {plan.bussiness_name} berhasil dihapus")
+        return jsonify(message=f"Data {decrypt(plan.bussiness_name)} berhasil dihapus")
     
     @jwt_required()
     def put(self, planID):
@@ -113,10 +114,10 @@ class OpenAIApi(Resource):
         plan = Bussiness_plan.query.filter_by(bussiness_plan_id=planID).first()
 
         bk_account = Bookkeeping_account(
-            name_account=plan.bussiness_name,
-            bussiness_email=plan.bussiness_email,
-            bussiness_location=plan.bussiness_location,
-            postal_code=plan.postal_code
+            name_account=encrypt(plan.bussiness_name),
+            bussiness_email=encrypt(plan.bussiness_email),
+            bussiness_location=encrypt(plan.bussiness_location),
+            postal_code=encrypt(plan.postal_code)
         )
 
         db.session.add(bk_account)
@@ -146,10 +147,10 @@ class OpenAIApi(Resource):
                 },
                 "account":{
                     "bookkeeping_account_id": bk_account.bookkeeping_account_id,
-                    "name_account": bk_account.name_account,
-                    "bussiness_email": bk_account.bussiness_email,
-                    "bussiness_location": bk_account.bussiness_location,
-                    "postal_code": bk_account.postal_code,
+                    "name_account": decrypt(bk_account.name_account),
+                    "bussiness_email": decrypt(bk_account.bussiness_email),
+                    "bussiness_location": decrypt(bk_account.bussiness_location),
+                    "postal_code": decrypt(bk_account.postal_code),
                     "created_at": bk_account.created_at
                 }
             }
